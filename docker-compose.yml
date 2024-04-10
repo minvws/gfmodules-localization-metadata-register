@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+    app:
+        build:
+            context: .
+            args:
+                NEW_UID: ${NEW_UID:-1000}
+                NEW_GID: ${NEW_GID:-1000}
+        volumes:
+            - ./:/src
+        ports:
+            - 8503:8503
+        networks:
+            - zmodules
+
+    metadata_db:
+        image: postgres:14
+        environment:
+            POSTGRES_DB: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+        networks:
+            - zmodules
+
+networks:
+  zmodules:
+    driver: bridge
