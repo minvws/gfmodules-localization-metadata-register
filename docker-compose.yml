@@ -14,15 +14,6 @@ services:
         networks:
             - zmodules
 
-    metadata_db:
-        image: postgres:14
-        environment:
-            POSTGRES_DB: postgres
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
-        networks:
-            - zmodules
-
 networks:
   zmodules:
     driver: bridge

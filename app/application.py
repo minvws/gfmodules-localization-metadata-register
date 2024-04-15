@@ -7,7 +7,7 @@ import uvicorn
 
 from routers.default import router as default_router
 from routers.health import router as health_router
-from routers.example import router as example_router
+from routers.metadata import router as metadata_router
 from config import get_config
 
 
@@ -68,7 +68,7 @@ def setup_fastapi() -> FastAPI:
         )
     )
 
-    routers = [default_router, health_router, example_router]
+    routers = [default_router, health_router, metadata_router]
     for router in routers:
         fastapi.include_router(router)
 
