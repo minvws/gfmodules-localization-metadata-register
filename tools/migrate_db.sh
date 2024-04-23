@@ -26,6 +26,7 @@ if
     echo "CREATE TABLE migrations (id serial PRIMARY KEY, name VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);" | psql -h $DB_HOST -U $DB_USER -d $DB_NAME -q -o /dev/null
 fi
 
+shopt -s nullglob
 for file in sql/*.sql; do
     # Check each SQL file to see if it's already in the migrations table
     if psql -h $DB_HOST -U $DB_USER -d $DB_NAME -c "SELECT name FROM migrations WHERE name = '$file';" | grep -q $file; then
