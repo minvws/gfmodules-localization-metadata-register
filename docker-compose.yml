@@ -1,4 +1,4 @@
-version: "3"
+version: "3.5"
 
 services:
     app:
@@ -12,8 +12,22 @@ services:
         ports:
             - 8503:8503
         networks:
+            zmodules:
+                aliases:
+                    - metadata
+
+    metadata_db:
+        image: postgres:14
+        environment:
+            POSTGRES_DB: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+        ports:
+            - 5403:5432
+        networks:
             - zmodules
 
 networks:
   zmodules:
     driver: bridge
+    name: zmodules

@@ -43,7 +43,7 @@ make container-build
 
 # Populate database
 echo "➡️ Populating the database"
-docker compose run app ./tools/migrate_db.sh metadata_db postgres postgres postgres
+docker compose run app ./tools/migrate_db.sh timeline_db postgres postgres postgres
 
 # Run the container
 echo "➡️ Running the application docker container"
