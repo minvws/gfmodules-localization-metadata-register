@@ -6,8 +6,6 @@ import inject
 
 import application
 
-from cron.cleanup_expired import CleanupExpired
-
 logger = logging.getLogger(__name__)
 
 
@@ -20,7 +18,6 @@ class CronCommand(Protocol):
 
 
 CRON_COMMANDS: dict[str, CronCommand] = {
-    "cleanup_expired": CleanupExpired,
 }
 
 
