@@ -10,7 +10,7 @@ repository is checked out, just run the following command:
 make autopilot
 ```
 
-This will configure the whole system for you and you should be able to use the API right away at https://localhost:8503/docs
+This will configure the whole system for you and you should be able to use the API right away at http://localhost:8503/docs
 
 
 ## Usage
