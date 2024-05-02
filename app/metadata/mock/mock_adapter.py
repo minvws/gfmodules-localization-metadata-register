@@ -1,3 +1,4 @@
+import logging
 from binascii import crc32
 
 from faker import Faker
@@ -5,6 +6,8 @@ from faker import Faker
 from app.data import DataDomain, Pseudonym, ProviderID
 from app.metadata.metadata_service import MetadataAdapter
 from app.metadata.models import MetadataEntry, Evaluation, Physician, HealthcareProvider
+
+logger = logging.getLogger(__name__)
 
 
 class MockMetadataAdapter(MetadataAdapter):
