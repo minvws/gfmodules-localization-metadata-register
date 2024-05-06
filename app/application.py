@@ -5,6 +5,7 @@ from typing import Any
 from fastapi import FastAPI
 import uvicorn
 
+from app.telemetry import setup_telemetry
 from routers.default import router as default_router
 from routers.health import router as health_router
 from routers.metadata import router as metadata_router
@@ -36,6 +37,9 @@ def run() -> None:
 def create_fastapi_app() -> FastAPI:
     application_init()
     fastapi = setup_fastapi()
+
+    if get_config().telemetry.enabled:
+        setup_telemetry(fastapi)
 
     return fastapi
 

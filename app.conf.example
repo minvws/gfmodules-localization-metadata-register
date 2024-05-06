@@ -2,6 +2,16 @@
 # Loglevel can be one of: debug, info, warning, error, critical
 loglevel=debug
 
+[telemetry]
+# Telemetry is enabled or not
+enabled = True
+# Endpoint to GRPC server for telemetry
+endpoint = http://tracing:4317
+# Service name to use
+service_name = localisation
+# Tracer name to use
+tracer_name = zmodules.service.localisation
+
 [uvicorn]
 # If true, the api docs will be enabled
 swagger_enabled = True

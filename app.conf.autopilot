@@ -1,6 +1,12 @@
 [app]
 loglevel=debug
 
+[telemetry]
+enabled = True
+endpoint = http://tracing:4317
+service_name = metadata
+tracer_name = zmodules.service.metadata
+
 [uvicorn]
 swagger_enabled = True
 docs_url = /docs
