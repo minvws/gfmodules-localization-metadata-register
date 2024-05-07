@@ -1,0 +1,49 @@
+name: Package python virtual env
+
+on:
+  push:
+    branches: [ build-venv ]
+    tags:
+      - v*
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        python_version: ['3.11']
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python_version }}
+
+      - name: Setup poetry
+        run: |
+          pip3 install poetry
+          poetry self add poetry-plugin-bundle
+
+      - name: Create venv
+        run: |
+          poetry bundle venv .venv --no-interaction --without dev
+
+      - name: Fix python3 symlink - back to default location
+        run: cd .venv/bin && rm python3 python && ln -s /usr/bin/python3 python3 && ln -s /usr/bin/python python
+
+      - name: Add version file
+        run: 'echo "{ \"version\": \"${{ env.RELEASE_VERSION }}\", \"git_ref\": \"$GITHUB_SHA\"}" > .venv/version.json'
+
+      - name: Create archive
+        run: tar -czf nl-irealisatie-zmodules-metadata-register_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz .venv
+
+      - name: Upload venv tar
+        uses: actions/upload-artifact@v4
+        with:
+          name: nl-irealisatie-zmodules-metadata-register_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}
+          path: nl-irealisatie-zmodules-metadata-register_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz
