@@ -1,0 +1,7 @@
+security:
+    ignore-cvss-severity-below: 0
+    ignore-cvss-unknown-severity: False
+    ignore-vulnerabilities:
+        67599:
+            reason: we don't use pip
+    continue-on-vulnerability-error: False

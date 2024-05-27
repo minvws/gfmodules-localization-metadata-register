@@ -2,6 +2,10 @@
 # Loglevel can be one of: debug, info, warning, error, critical
 loglevel=debug
 
+[database]
+# Dsn for database connection
+dsn=postgresql+psycopg://postgres:postgres@localhost:5432/postgres
+
 [telemetry]
 # Telemetry is enabled or not
 enabled = True

@@ -1,0 +1,195 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:patient123",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "patient123",
+        "identifier": [
+          {
+            "system": "http://hospital.org/patients",
+            "value": "12345"
+          }
+        ],
+        "name": [
+          {
+            "use": "official",
+            "family": "Doe",
+            "given": [
+              "John"
+            ]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1980-01-01"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ctstudy123",
+      "resource": {
+        "resourceType": "ImagingStudy",
+        "status": "available",
+        "id": "ctstudy123",
+        "subject": {
+          "reference": "urn:uuid:patient123"
+        },
+        "series": [
+          {
+            "uid": "series1",
+            "modality": {
+              "coding": [
+                {
+                  "system": "http://dicom.nema.org/resources/ontology/DCM",
+                  "code": "CT"
+                }
+              ]
+            },
+            "bodySite": {
+              "concept": {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "51185008",
+                    "display": "CT of Head"
+                  }
+                ]
+              }
+            },
+            "instance": [
+              {
+                "uid": "instance201",
+                "sopClass": {
+                  "system": "http://dicom.nema.org/resources/ontology/DCM",
+                  "code": "CT01",
+                  "display": "CT Head"
+                },
+                "title": "CT Head Image 1"
+              },
+              {
+                "uid": "instance202",
+                "sopClass": {
+                  "system": "http://dicom.nema.org/resources/ontology/DCM",
+                  "code": "CT02",
+                  "display": "CT Head"
+                },
+                "title": "CT Head Image 2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:mristudy123",
+      "resource": {
+        "resourceType": "ImagingStudy",
+        "id": "mristudy123",
+        "status": "available",
+        "subject": {
+          "reference": "urn:uuid:patient123"
+        },
+        "series": [
+          {
+            "uid": "series1",
+            "modality": {
+              "coding": [
+                {
+                  "system": "http://dicom.nema.org/resources/ontology/DCM",
+                  "code": "CT"
+                }
+              ]
+            },
+            "bodySite": {
+              "concept": {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "66019005",
+                    "display": "MRI of Spine"
+                  }
+                ]
+              }
+            },
+            "instance": [
+              {
+                "uid": "instance301",
+                "sopClass": {
+                  "system": "http://dicom.nema.org/resources/ontology/DCM",
+                  "code": "MRI01",
+                  "display": "MRI Spine"
+                },
+                "title": "MRI Spine Image 1"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:observation301",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "observation301",
+        "subject": {
+          "reference": "urn:uuid:patient123"
+        },
+        "status": "available",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "11223-3",
+              "display": "CT Head findings"
+            }
+          ]
+        },
+        "valueString": "Mild sinusitis",
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "A",
+                "display": "Abnormal"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:observation302",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "observation302",
+        "status": "available",
+        "subject": {
+          "reference": "urn:uuid:patient123"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "11224-1",
+              "display": "MRI Spine findings"
+            }
+          ]
+        },
+        "valueString": "No abnormalities detected",
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "N",
+                "display": "Normal"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

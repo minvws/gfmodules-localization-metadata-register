@@ -1,6 +1,9 @@
 [app]
 loglevel=debug
 
+[database]
+dsn=postgresql+psycopg://postgres:postgres@metadata_db:5432/postgres
+
 [telemetry]
 enabled = True
 endpoint = http://tracing:4317

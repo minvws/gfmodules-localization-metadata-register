@@ -1,0 +1,1 @@
+This directory contains some example FHIR json files that can be used for uploading to the metadata service.
