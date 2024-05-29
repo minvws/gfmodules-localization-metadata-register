@@ -21,6 +21,10 @@ class ConfigApp(BaseModel):
     loglevel: LogLevel = Field(default=LogLevel.info)
 
 
+class ConfigDatabase(BaseModel):
+    dsn: str
+
+
 class ConfigUvicorn(BaseModel):
     swagger_enabled: bool = Field(default=False)
     docs_url: str = Field(default="/docs")
@@ -43,6 +47,7 @@ class ConfigTelemetry(BaseModel):
 
 class Config(BaseModel):
     app: ConfigApp
+    database: ConfigDatabase
     uvicorn: ConfigUvicorn
     telemetry: ConfigTelemetry
 

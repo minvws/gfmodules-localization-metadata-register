@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class MockMetadataAdapter(MetadataAdapter):
-    def search(self, provider_id: ProviderID, data_domain: DataDomain, pseudonym: Pseudonym) -> MetadataEntry | None:
+    def search(self, provider_id: ProviderID|None, data_domain: DataDomain, pseudonym: Pseudonym) -> MetadataEntry | None:
         faker = Faker('nl_NL')
 
         # Each unique combination results in a deterministic set of metadata
