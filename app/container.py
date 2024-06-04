@@ -4,7 +4,6 @@ from app.config import get_config
 from app.db.db import Database
 from app.metadata.metadata_service import MetadataService
 from app.metadata.db.db_adapter import DbMetadataAdapter
-from app.metadata.mock.mock_adapter import MockMetadataAdapter
 
 
 def container_config(binder: inject.Binder) -> None:
@@ -19,10 +18,6 @@ def container_config(binder: inject.Binder) -> None:
 
 def get_database() -> Database:
     return inject.instance(Database)
-
-
-def get_deprecated_metadata_service() -> MetadataService:
-    return MetadataService(MockMetadataAdapter())
 
 
 def get_metadata_service() -> MetadataService:
