@@ -23,6 +23,7 @@ class ConfigApp(BaseModel):
 
 class ConfigDatabase(BaseModel):
     dsn: str
+    create_tables: bool = Field(default=False)
 
 
 class ConfigUvicorn(BaseModel):
@@ -66,6 +67,11 @@ def read_ini_file(path: str) -> Any:
 def reset_config() -> None:
     global _CONFIG
     _CONFIG = None
+
+
+def set_config(config: Config) -> None:
+    global _CONFIG
+    _CONFIG = config
 
 
 def get_config(path: str | None = None) -> Config:

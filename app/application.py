@@ -5,12 +5,13 @@ from typing import Any
 from fastapi import FastAPI
 import uvicorn
 
+from app.container import setup_container
 from app.telemetry import setup_telemetry
-from routers.default import router as default_router
-from routers.health import router as health_router
-from routers.metadata import router as metadata_router
-from routers.resource import router as resource_router
-from config import get_config
+from app.routers.default import router as default_router
+from app.routers.health import router as health_router
+from app.routers.resource import router as metadata_router
+from app.routers.resource import router as resource_router
+from app.config import get_config
 
 
 def get_uvicorn_params() -> dict[str, Any]:
@@ -22,12 +23,8 @@ def get_uvicorn_params() -> dict[str, Any]:
         "reload": config.uvicorn.reload,
     }
     if config.uvicorn.use_ssl:
-        kwargs["ssl_keyfile"] = (
-            config.uvicorn.ssl_base_dir + "/" + config.uvicorn.ssl_key_file
-        )
-        kwargs["ssl_certfile"] = (
-            config.uvicorn.ssl_base_dir + "/" + config.uvicorn.ssl_cert_file
-        )
+        kwargs["ssl_keyfile"] = f"{config.uvicorn.ssl_base_dir}/{config.uvicorn.ssl_key_file}"
+        kwargs["ssl_certfile"] = f"{config.uvicorn.ssl_base_dir}/{config.uvicorn.ssl_cert_file}"
     return kwargs
 
 
@@ -46,6 +43,7 @@ def create_fastapi_app() -> FastAPI:
 
 
 def application_init() -> None:
+    setup_container()
     setup_logging()
 
 

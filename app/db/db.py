@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, StaticPool
 from sqlalchemy.orm import Session
 
 from app.db.session import DbSession
@@ -10,12 +10,23 @@ logger = logging.getLogger(__name__)
 
 
 class Database:
-    def __init__(self, dsn: str):
+    def __init__(self, dsn: str, create_tables: bool = False):
         try:
-            self.engine = create_engine(dsn, echo=False)
+            if "sqlite://" in dsn:
+                self.engine = create_engine(
+                    dsn,
+                    connect_args={'check_same_thread': False},      # This + static pool is needed for sqlite in-memory tables
+                    poolclass=StaticPool
+                )
+            else:
+                self.engine = create_engine(dsn, echo=False)
+
         except BaseException as e:
             logger.error("Error while connecting to database: %s", e)
             raise e
+
+        if create_tables:
+            self.generate_tables()
 
     def generate_tables(self) -> None:
         logger.info("Generating tables...")
