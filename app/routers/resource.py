@@ -44,20 +44,6 @@ def search_resource(
     return bundle.dict()
 
 
-@router.get("/resource/{resource_type}/{resource_id}",
-    summary="Find a specific type/id combination in the metadata",
-    tags=["metadata"]
-)
-def get_resource(
-        resource_type: str,
-        resource_id: str,
-        _pretty: bool = False,
-        service: MetadataService = Depends(container.get_metadata_service)
-) -> Any:
-
-    return get_resource_by_version(resource_type, resource_id, 0, service, _pretty)
-
-
 @router.get("/resource/{resource_type}/{resource_id}/_history/{vid}",
     summary="Find a specific version of the resource in the metadata",
     tags=["metadata"]
@@ -70,6 +56,20 @@ def get_resource_history(
         service: MetadataService = Depends(container.get_metadata_service)
 ) -> Any:
     return get_resource_by_version(resource_type, resource_id, vid, service, _pretty)
+
+
+@router.get("/resource/{resource_type}/{resource_id}",
+    summary="Find a specific type/id combination in the metadata",
+    tags=["metadata"]
+)
+def get_resource(
+        resource_type: str,
+        resource_id: str,
+        _pretty: bool = False,
+        service: MetadataService = Depends(container.get_metadata_service)
+) -> Any:
+
+    return get_resource_by_version(resource_type, resource_id, 0, service, _pretty)
 
 
 @router.put("/resource/{resource_type}/{resource_id}",

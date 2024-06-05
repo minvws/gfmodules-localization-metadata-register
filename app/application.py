@@ -61,10 +61,24 @@ def setup_logging() -> None:
 def setup_fastapi() -> FastAPI:
     config = get_config()
 
+    tags_metadata = [
+        {
+            "name": "default",
+            "description": "Global operations"
+        },
+        {
+            "name": "metadata",
+            "description": "Metadata operations"
+        }
+    ]
+
     fastapi = (
         FastAPI(
+            title="Metadata register",
+            description="This register keeps metadata from different resources",
             docs_url=config.uvicorn.docs_url,
-            redoc_url=config.uvicorn.redoc_url
+            redoc_url=config.uvicorn.redoc_url,
+            openapi_tags=tags_metadata,
         ) if config.uvicorn.swagger_enabled else FastAPI(
             docs_url=None,
             redoc_url=None
