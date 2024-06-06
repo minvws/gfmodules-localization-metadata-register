@@ -9,7 +9,7 @@ from app.metadata.db.db_adapter import DbMetadataAdapter
 def container_config(binder: inject.Binder) -> None:
     config = get_config()
 
-    db = Database(dsn=config.database.dsn)
+    db = Database(dsn=config.database.dsn, create_tables=config.database.create_tables)
     binder.bind(Database, db)
 
     metadata_service = MetadataService(DbMetadataAdapter(db))
@@ -24,4 +24,5 @@ def get_metadata_service() -> MetadataService:
     return inject.instance(MetadataService)
 
 
-inject.configure(container_config)
+def setup_container() -> None:
+    inject.configure(container_config)

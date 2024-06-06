@@ -3,6 +3,7 @@ loglevel=debug
 
 [database]
 dsn=postgresql+psycopg://postgres:postgres@metadata_db:5432/postgres
+create_tables=false
 
 [telemetry]
 enabled = True

@@ -5,6 +5,8 @@ loglevel=debug
 [database]
 # Dsn for database connection
 dsn=postgresql+psycopg://postgres:postgres@localhost:5432/postgres
+# Should tables be created if they do not exist
+create_tables=false
 
 [telemetry]
 # Telemetry is enabled or not
