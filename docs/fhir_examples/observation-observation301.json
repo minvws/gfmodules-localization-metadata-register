@@ -1,0 +1,29 @@
+{
+  "resourceType": "Observation",
+  "id": "observation301",
+  "subject": {
+    "reference": "urn:uuid:patient123"
+  },
+  "status": "available",
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "11223-3",
+        "display": "CT Head findings"
+      }
+    ]
+  },
+  "valueString": "Mild sinusitis",
+  "interpretation": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+          "code": "A",
+          "display": "Abnormal"
+        }
+      ]
+    }
+  ]
+}

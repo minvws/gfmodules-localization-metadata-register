@@ -1,0 +1,21 @@
+{
+  "resourceType": "Patient",
+  "id": "patient123",
+  "identifier": [
+    {
+      "system": "http://hospital.org/patients",
+      "value": "12345"
+    }
+  ],
+  "name": [
+    {
+      "use": "official",
+      "family": "Doe",
+      "given": [
+        "John"
+      ]
+    }
+  ],
+  "gender": "male",
+  "birthDate": "1980-01-01"
+}
