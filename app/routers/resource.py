@@ -19,9 +19,9 @@ router = APIRouter()
 
 
 @router.get("/resource/{resource_type}/_search",
-    summary="Find all resources for given type for the pseudonym",
-    tags=["metadata"]
-)
+            summary="Find all resources for given type for the pseudonym",
+            tags=["metadata"]
+            )
 def search_resource(
         pseudonym: Pseudonym,
         resource_type: str,
@@ -33,21 +33,21 @@ def search_resource(
 
     entry = service.search_by_pseudonym(pseudonym, resource_type)
 
-    bundle = Bundle(     # type: ignore
+    bundle = Bundle(  # type: ignore
         resource_type="Bundle",
         id=Id(uuid.uuid4()),
         type=Code("searchset"),
         total=UnsignedInt(len(entry)),
-        entry=[BundleEntry(resource=res.dict()) for res in entry]  # type: ignore
+        entry=[BundleEntry(resource=res.resource) for res in entry]  # type: ignore
     )
 
     return bundle.dict()
 
 
 @router.get("/resource/{resource_type}/{resource_id}/_history/{vid}",
-    summary="Find a specific version of the resource in the metadata",
-    tags=["metadata"]
-)
+            summary="Find a specific version of the resource in the metadata",
+            tags=["metadata"]
+            )
 def get_resource_history(
         resource_type: str,
         resource_id: str,
@@ -59,23 +59,22 @@ def get_resource_history(
 
 
 @router.get("/resource/{resource_type}/{resource_id}",
-    summary="Find a specific type/id combination in the metadata",
-    tags=["metadata"]
-)
+            summary="Find a specific type/id combination in the metadata",
+            tags=["metadata"]
+            )
 def get_resource(
         resource_type: str,
         resource_id: str,
         _pretty: bool = False,
         service: MetadataService = Depends(container.get_metadata_service)
 ) -> Any:
-
     return get_resource_by_version(resource_type, resource_id, 0, service, _pretty)
 
 
 @router.put("/resource/{resource_type}/{resource_id}",
-    summary="Creates or updates a specific type/id combination in the metadata",
-    tags=["metadata"]
-)
+            summary="Creates or updates a specific type/id combination in the metadata",
+            tags=["metadata"]
+            )
 def put_resource(
         pseudonym: Pseudonym,
         resource_type: str,
@@ -108,14 +107,15 @@ def put_resource(
         headers={
             "ETag": str(entry.version),
             "Last-Modified": entry.created_dt.isoformat(),
+            "Location": f"/resource/{resource_type}/{resource_id}/_history/{entry.version}",
         }
     )
 
 
 @router.delete("/resource/{resource_type}/{resource_id}",
-    summary="Removes a given type/id combination from the metadata",
-    tags=["metadata"]
-)
+               summary="Removes a given type/id combination from the metadata",
+               tags=["metadata"]
+               )
 def delete_resource(
         resource_type: str,
         resource_id: str,
@@ -134,7 +134,24 @@ def delete_resource(
     return Response(status_code=204)
 
 
-def get_resource_by_version(resource_type: str, resource_id: str, vid: int, service: MetadataService, pretty: bool = False) -> Response:
+@router.patch("/resource/{resource_type}/{resource_id}",
+              summary="Patches a specific type/id combination in the metadata",
+              tags=["metadata"]
+              )
+def patch_resource(
+        resource_type: str,
+        resource_id: str,
+) -> Response:
+    span = trace.get_current_span()
+    span.set_attribute("data.resource_type", resource_type)
+    span.set_attribute("data.resource_id", resource_id)
+
+    # We do not support PATCH
+    return Response(status_code=405)
+
+
+def get_resource_by_version(resource_type: str, resource_id: str, vid: int, service: MetadataService,
+                            pretty: bool = False) -> Response:
     """
     Get a resource from the metadata service based on the id and version. If vid == 0, it will fetch the
     latest version

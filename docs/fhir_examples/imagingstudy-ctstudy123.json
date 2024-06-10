@@ -27,7 +27,7 @@
         },
         {
           "actor": {
-            "reference": "Practicioner/pract1",
+            "reference": "Practitioner/pract1",
             "type": "Practitioner"
           }
         }

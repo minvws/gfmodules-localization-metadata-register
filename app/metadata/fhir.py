@@ -4,10 +4,27 @@ import logging
 from fhir.resources.resource import Resource
 from typing import Dict, Any
 
+from pydantic import BaseModel
+
 logger = logging.getLogger(__name__)
 
 
-ALLOWED_RESOURCES = ['Patient', 'ImagingStudy', 'Observation']
+ALLOWED_RESOURCES = ['Patient', 'ImagingStudy', 'Observation', 'Practitioner', 'Organization']
+
+
+class OperationOutcomeDetail(BaseModel):
+    text: str
+
+
+class OperationOutcomeIssue(BaseModel):
+    severity: str
+    code: str
+    details: OperationOutcomeDetail
+
+
+class OperationOutcome(BaseModel):
+    resourceType: str = "OperationOutcome"
+    issue: list[OperationOutcomeIssue]
 
 
 def convert_resource_to_fhir(data: Dict[str, Any]) -> Resource|None:
