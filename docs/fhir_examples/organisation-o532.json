@@ -1,0 +1,52 @@
+{
+  "resourceType": "Organization",
+  "id": "o532",
+  "identifier": [
+    {
+      "use": "official",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "PRN",
+            "display": "Provider number"
+          }
+        ]
+      },
+      "system": "http://www.hospital-directory.example.org",
+      "value": "H12345678"
+    }
+  ],
+  "active": true,
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/organization-type",
+          "code": "prov",
+          "display": "Healthcare Provider"
+        }
+      ]
+    }
+  ],
+  "name": "Royal Haven Hospital",
+  "contact": [
+    {
+      "purpose": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/contactentity-type",
+            "code": "BILL",
+            "display": "Billing"
+          }
+        ]
+      },
+      "name": [{
+        "family": "De Vries",
+        "given": [
+          "Linda"
+        ]
+      }]
+    }
+  ]
+}

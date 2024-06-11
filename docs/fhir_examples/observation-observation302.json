@@ -1,0 +1,29 @@
+{
+  "resourceType": "Observation",
+  "id": "observation302",
+  "status": "available",
+  "subject": {
+    "reference": "urn:uuid:patient123"
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "11224-1",
+        "display": "MRI Spine findings"
+      }
+    ]
+  },
+  "valueString": "No abnormalities detected",
+  "interpretation": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+          "code": "N",
+          "display": "Normal"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "resourceType": "ImagingStudy",
+  "status": "available",
+  "id": "ctstudy646",
+  "subject": {
+    "reference": "Patient/patient123"
+  },
+  "started": "2011-01-01T11:01:20+03:00",
+  "series": [
+    {
+      "uid": "series1",
+      "started": "2011-01-01T11:01:20+03:00",
+      "modality": {
+        "coding": [
+          {
+            "system": "https://dicom.nema.org/resources/ontology/DCM",
+            "code": "CT"
+          }
+        ]
+      },
+      "performer": [
+        {
+          "actor": {
+            "reference": "Organisation/o532",
+            "type": "Organization"
+          }
+        },
+        {
+          "actor": {
+            "reference": "Practitioner/pract1",
+            "type": "Practitioner"
+          }
+        }
+      ],
+      "bodySite": {
+        "concept": {
+          "coding": [
+            {
+              "system": "https://snomed.info/sct",
+              "code": "51185008",
+              "display": "CT of Head"
+            }
+          ]
+        }
+      },
+      "instance": [
+        {
+          "uid": "instance201",
+          "sopClass": {
+            "system": "https://dicom.nema.org/resources/ontology/DCM",
+            "code": "CT01",
+            "display": "CT Head"
+          },
+          "title": "CT Head Image 1"
+        },
+        {
+          "uid": "instance202",
+          "sopClass": {
+            "system": "https://dicom.nema.org/resources/ontology/DCM",
+            "code": "CT02",
+            "display": "CT Head"
+          },
+          "title": "CT Head Image 2"
+        }
+      ]
+    }
+  ]
+}
