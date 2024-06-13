@@ -21,7 +21,7 @@
       "performer": [
         {
           "actor": {
-            "reference": "Organisation/o532",
+            "reference": "Organization/o532",
             "type": "Organization"
           }
         },
