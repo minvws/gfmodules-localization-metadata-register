@@ -29,53 +29,49 @@ class DbMetadataAdapter(MetadataAdapter):
         """
         Search for metadata for a pseudonym
         """
-        session = self.db.get_db_session()
+        with self.db.get_db_session() as session:
+            resource_repository = self.get_fhir_resource_repository(session)
+            if not resource_repository:
+                return []
 
-        resource_repository = self.get_fhir_resource_repository(session)
-        if not resource_repository:
-            return []
-
-        return resource_repository.find_by_pseudonym(pseudonym, resource_type)
+            return resource_repository.find_by_pseudonym(pseudonym, resource_type)
 
     def search(self, resource_type: str, resource_id: str, version: int) -> ResourceEntry | None:
         """
         Search for metadata for a resource
         """
-        session = self.db.get_db_session()
+        with self.db.get_db_session() as session:
+            (resource_type, resource_id) = sanitize(resource_type, resource_id)
 
-        (resource_type, resource_id) = sanitize(resource_type, resource_id)
+            resource_repository = self.get_fhir_resource_repository(session)
+            if not resource_repository:
+                return None
 
-        resource_repository = self.get_fhir_resource_repository(session)
-        if not resource_repository:
-            return None
-
-        return resource_repository.find_by_resource(resource_type, resource_id, version)
+            return resource_repository.find_by_resource(resource_type, resource_id, version)
 
     def delete(self, resource_type: str, resource_id: str) -> None:
         """
         Delete metadata for a resource
         """
-        session = self.db.get_db_session()
+        with self.db.get_db_session() as session:
+            (resource_type, resource_id) = sanitize(resource_type, resource_id)
 
-        (resource_type, resource_id) = sanitize(resource_type, resource_id)
+            resource_repository = self.get_fhir_resource_repository(session)
+            if not resource_repository:
+                return None
 
-        resource_repository = self.get_fhir_resource_repository(session)
-        if not resource_repository:
-            return None
-
-        resource_repository.delete_by_resource(resource_type, resource_id)
+            resource_repository.delete_by_resource(resource_type, resource_id)
 
     def update(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym) -> ResourceEntry | None:
         """
         Update metadata for a resource
         """
-        session = self.db.get_db_session()
+        with self.db.get_db_session() as session:
+            resource_repository = self.get_fhir_resource_repository(session)
+            if not resource_repository:
+                return None
 
-        resource_repository = self.get_fhir_resource_repository(session)
-        if not resource_repository:
-            return None
-
-        return resource_repository.upsert(resource_type, resource_id, data, pseudonym)
+            return resource_repository.upsert(resource_type, resource_id, data, pseudonym)
 
     @staticmethod
     def get_fhir_resource_repository(session: DbSession) -> ResourceEntryRepository:
