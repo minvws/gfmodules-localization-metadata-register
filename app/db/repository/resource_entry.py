@@ -18,7 +18,7 @@ class ResourceEntryRepository(RepositoryBase):
                 .where(ResourceEntry.pseudonym == str(pseudonym))
                 .where(ResourceEntry.resource_type.ilike(resource_type)))
 
-        return self.session.execute(stmt).scalars().all()
+        return self.db_session.execute(stmt).scalars().all()    # type: ignore
 
     def find_by_resource(self, resource_type: str, resource_id: str, version: int) -> ResourceEntry | None:
         stmt = (select(ResourceEntry)
@@ -32,7 +32,7 @@ class ResourceEntryRepository(RepositoryBase):
         else:
             stmt = stmt.where(ResourceEntry.version == version)
 
-        return self.session.execute(stmt).scalars().first()
+        return self.db_session.execute(stmt).scalars().first()  # type: ignore
 
     def delete_by_resource(self, resource_type: str, resource_id: str) -> None:
         stmt = (update(ResourceEntry)
@@ -40,24 +40,24 @@ class ResourceEntryRepository(RepositoryBase):
                 .where(ResourceEntry.resource_id.ilike(resource_id))
                 .values(deleted=True))
 
-        self.session.execute(stmt)
-        self.session.commit()
+        self.db_session.execute(stmt)
+        self.db_session.commit()
 
     def upsert(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym) -> ResourceEntry | None:
-        running_postgres = "postgresql" in str(self.session.bind)
+        running_postgres = "postgresql" in str(self.db_session.session.bind)
 
-        with self.session.begin():
+        with self.db_session.begin():
             if running_postgres:
                 # Advisory lock to prevent concurrent updates
                 lock_fn = sqlalchemy.func.pg_advisory_xact_lock(0xdeadbeef)
-                self.session.execute(sqlalchemy.select(lock_fn))
+                self.db_session.execute(sqlalchemy.select(lock_fn))
 
             # Get the current maximum version
             stmt = (select(func.max(ResourceEntry.version))
                            .where(ResourceEntry.resource_type.ilike(resource_type))
                            .where(ResourceEntry.resource_id.ilike(resource_id)))
 
-            result = self.session.execute(stmt)
+            result = self.db_session.execute(stmt)
             max_version = result.scalar()
             next_version = (max_version or 0) + 1
 
@@ -73,7 +73,7 @@ class ResourceEntryRepository(RepositoryBase):
                 deleted=False,
             )
 
-            self.session.add(entry)
-            self.session.commit()
+            self.db_session.add(entry)
+            self.db_session.commit()
 
             return entry
