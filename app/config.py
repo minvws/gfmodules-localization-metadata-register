@@ -24,7 +24,7 @@ class ConfigApp(BaseModel):
 class ConfigDatabase(BaseModel):
     dsn: str
     create_tables: bool = Field(default=False)
-    retry_backoff: list[int] = Field(default=[0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 4.8, 6.4, 10.0])
+    retry_backoff: list[float] = Field(default=[0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 4.8, 6.4, 10.0])
     pool_size: int = Field(default=5, ge=0, lt=100)
     max_overflow: int = Field(default=10, ge=0, lt=100)
     pool_pre_ping: bool = Field(default=False)
@@ -94,6 +94,11 @@ def get_config(path: str | None = None) -> Config:
     ini_data = read_ini_file(path)
 
     try:
+        # Convert database.retry_backoff to a list of floats
+        ini_data["database"]["retry_backoff"] = [
+            float(i) for i in ini_data["database"]["retry_backoff"].split(",")
+        ]
+
         _CONFIG = Config(**ini_data)
     except ValidationError as e:
         raise e
