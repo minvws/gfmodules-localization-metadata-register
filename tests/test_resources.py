@@ -7,37 +7,10 @@ from fhir.resources.patient import Patient
 from app.application import create_fastapi_app
 from fastapi.testclient import TestClient
 
-from app.config import Config, ConfigApp, ConfigDatabase, ConfigUvicorn, ConfigTelemetry, set_config, LogLevel
+from app.config import set_config
+from test_config import get_test_config
 
-config = Config(
-    app=ConfigApp(
-        loglevel=LogLevel.error,
-    ),
-    database=ConfigDatabase(
-        dsn="sqlite:///:memory:",
-        create_tables=True,
-    ),
-    uvicorn=ConfigUvicorn(
-        swagger_enabled=False,
-        docs_url="/docs",
-        redoc_url="/redoc",
-        host="0.0.0.0",
-        port=8503,
-        reload=True,
-        use_ssl=False,
-        ssl_base_dir=None,
-        ssl_cert_file=None,
-        ssl_key_file=None,
-    ),
-    telemetry=ConfigTelemetry(
-        enabled=False,
-        endpoint=None,
-        service_name=None,
-        tracer_name=None,
-    ),
-)
-set_config(config)
-
+set_config(get_test_config())
 app = create_fastapi_app()
 client = TestClient(app)
 

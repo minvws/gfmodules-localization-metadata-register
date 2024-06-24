@@ -8,7 +8,7 @@ dsn=postgresql+psycopg://postgres:postgres@localhost:5432/postgres
 # Should tables be created if they do not exist
 create_tables=false
 # Retry backoff (in seconds) for database connection
-retry_backoff=[0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 4.8, 6.4, 10.0]
+retry_backoff=0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 4.8, 6.4, 10.0
 # Connection pool size, use 0 for unlimited connections
 pool_size=5
 # Max overflow for connection pool
