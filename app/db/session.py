@@ -17,7 +17,7 @@ Usage:
     with DbSession(engine) as session:
         repo = session.get_repository(MyModel)
         repo.find_all()
-        session.add_resource(MyModel())
+        session.add(MyModel())
         session.commit()       
 """
 
@@ -51,7 +51,7 @@ class DbSession:
             return repo_class(self.session)
         raise ValueError(f"No repository registered for model {model}")
 
-    def add_resource(self, entry: Base) -> None:
+    def add(self, entry: Base) -> None:
         """
         Add a resource to the session, so it will be inserted/updated in the database on the next commit
 
@@ -60,7 +60,7 @@ class DbSession:
         """
         self.session.add(entry)
 
-    def delete_resource(self, entry: Base) -> None:
+    def delete(self, entry: Base) -> None:
         """
         Delete a resource from the session, so it will be deleted from the database on the next commit
 
