@@ -21,7 +21,7 @@ Usage:
     with DbSession(engine) as session:
         repo = session.get_repository(MyModel)
         repo.find_all()
-        session.add_resource(MyModel())
+        session.add(MyModel())
         session.commit()       
 """
 
