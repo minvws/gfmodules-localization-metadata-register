@@ -27,11 +27,14 @@ jobs:
       - name: Setup poetry
         run: |
           pip3 install poetry
-          poetry self add poetry-plugin-bundle
+          poetry self add poetry-plugin-export
 
       - name: Create venv
         run: |
-          poetry bundle venv .venv --no-interaction --without dev
+          poetry export > requirements.txt 
+          python -m venv .venv
+          . .venv/bin/activate          
+          pip install -r requirements.txt
 
       - name: Fix python3 symlink - back to default location
         run: cd .venv/bin && rm python3 python && ln -s /usr/bin/python3 python3 && ln -s /usr/bin/python python

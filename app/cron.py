@@ -4,7 +4,7 @@ from typing import Protocol, Any
 
 import inject
 
-import application
+from app import application
 
 logger = logging.getLogger(__name__)
 
