@@ -54,4 +54,4 @@ WORKDIR ${PROJECT_DIR}
 
 ENV PYTHONPATH=${PROJECT_DIR}
 
-CMD python app/main.py
+CMD docker/./init.sh metadata_db
