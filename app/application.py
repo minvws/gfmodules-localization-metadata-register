@@ -24,14 +24,18 @@ def get_uvicorn_params() -> dict[str, Any]:
         "port": config.uvicorn.port,
         "reload": config.uvicorn.reload,
     }
-    if config.uvicorn.use_ssl:
+    if (config.uvicorn.use_ssl and
+            config.uvicorn.ssl_base_dir is not None and
+            config.uvicorn.ssl_cert_file is not None and
+            config.uvicorn.ssl_key_file is not None
+    ):
         kwargs["ssl_keyfile"] = f"{config.uvicorn.ssl_base_dir}/{config.uvicorn.ssl_key_file}"
         kwargs["ssl_certfile"] = f"{config.uvicorn.ssl_base_dir}/{config.uvicorn.ssl_cert_file}"
     return kwargs
 
 
 def run() -> None:
-    uvicorn.run("application:create_fastapi_app", **get_uvicorn_params())
+    uvicorn.run("app.application:create_fastapi_app", **get_uvicorn_params())
 
 
 def create_fastapi_app() -> FastAPI:
