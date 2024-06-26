@@ -59,7 +59,6 @@ def generate_mocks(pseudonym):
     except FileExistsError:
         pass
 
-    # print(json.dumps(patient.dict(), indent=4, cls=CustomJSONEncoder))
     patient = generate_patient()
     patient_id = patient.identifier[0].value
     with open(f"{path}/patient-{patient_id}.json", "w") as f:
