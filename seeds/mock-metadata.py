@@ -66,7 +66,6 @@ def generate_mocks(pseudonym):
     store("Patient", patient_id, patient, pseudonym)
 
 
-    # print(json.dumps(patient.dict(), indent=4, cls=CustomJSONEncoder))
     org = generate_organization()
     org_id = org.identifier[0].value
     with open(f"{path}/org-{org_id}.json", "w") as f:
