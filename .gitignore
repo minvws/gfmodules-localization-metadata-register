@@ -7,3 +7,4 @@ secrets/
 *.priv
 *.pub
 .autopilot
+mocks
