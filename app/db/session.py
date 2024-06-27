@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 T = TypeVar('T')
 
+
 class DbSession:
     def __init__(self, engine: Engine) -> None:
         self._engine = engine
@@ -51,7 +52,7 @@ class DbSession:
         Returns an instantiated repository
         """
         if issubclass(repository_class, RepositoryBase):
-            return repository_class(self.session)
+            return repository_class(self)
         raise ValueError(f"No repository registered for model {repository_class}")
 
     def add(self, entry: Base) -> None:
@@ -105,6 +106,12 @@ class DbSession:
         :return:
         """
         return self._retry(self.session.begin)
+
+    def get_dialect(self) -> str:
+        """
+        Get the dialect of the current session
+        """
+        return str(self.session.bind)
 
     def _retry(self, f: Callable[..., T], *args: Any, **kwargs: Any) -> T:
         """
