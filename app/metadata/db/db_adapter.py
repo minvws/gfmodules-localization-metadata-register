@@ -1,11 +1,10 @@
 import logging
-from typing import cast, Sequence, Tuple, Any
+from typing import Sequence, Tuple, Any
 
 from app.data import Pseudonym
 from app.db.db import Database
 from app.db.models import ResourceEntry
 from app.db.repository.resource_entry import ResourceEntryRepository
-from app.db.session import DbSession
 from app.metadata.metadata_service import MetadataAdapter
 
 logger = logging.getLogger(__name__)
@@ -30,7 +29,7 @@ class DbMetadataAdapter(MetadataAdapter):
         Search for metadata for a pseudonym
         """
         with self.db.get_db_session() as session:
-            resource_repository = self.get_fhir_resource_repository(session)
+            resource_repository = session.get_repository(ResourceEntryRepository)
             if not resource_repository:
                 return []
 
@@ -43,7 +42,7 @@ class DbMetadataAdapter(MetadataAdapter):
         with self.db.get_db_session() as session:
             (resource_type, resource_id) = sanitize(resource_type, resource_id)
 
-            resource_repository = self.get_fhir_resource_repository(session)
+            resource_repository = session.get_repository(ResourceEntryRepository)
             if not resource_repository:
                 return None
 
@@ -56,7 +55,7 @@ class DbMetadataAdapter(MetadataAdapter):
         with self.db.get_db_session() as session:
             (resource_type, resource_id) = sanitize(resource_type, resource_id)
 
-            resource_repository = self.get_fhir_resource_repository(session)
+            resource_repository = session.get_repository(ResourceEntryRepository)
             if not resource_repository:
                 return None
 
@@ -67,15 +66,8 @@ class DbMetadataAdapter(MetadataAdapter):
         Update metadata for a resource
         """
         with self.db.get_db_session() as session:
-            resource_repository = self.get_fhir_resource_repository(session)
+            resource_repository = session.get_repository(ResourceEntryRepository)
             if not resource_repository:
                 return None
 
             return resource_repository.upsert(resource_type, resource_id, data, pseudonym)
-
-    @staticmethod
-    def get_fhir_resource_repository(session: DbSession) -> ResourceEntryRepository:
-        return cast(
-            ResourceEntryRepository,
-            session.get_repository(ResourceEntry)
-        )

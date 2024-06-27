@@ -44,10 +44,8 @@ class ResourceEntryRepository(RepositoryBase):
         self.db_session.commit()
 
     def upsert(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym) -> ResourceEntry | None:
-        running_postgres = "postgresql" in str(self.db_session.session.bind)
-
         with self.db_session.begin():
-            if running_postgres:
+            if self.db_session.get_dialect() == "postgresql":
                 # Advisory lock to prevent concurrent updates
                 lock_fn = sqlalchemy.func.pg_advisory_xact_lock(0xdeadbeef)
                 self.db_session.execute(sqlalchemy.select(lock_fn))
