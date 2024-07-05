@@ -13,8 +13,8 @@ pool_recycle=1800
 [telemetry]
 enabled = True
 endpoint = http://tracing:4317
-service_name = metadata
-tracer_name = zmodules.service.metadata
+service_name = Lokalisatie Metadata Register
+tracer_name = zmodules.service.localisation_metadata_register
 
 [uvicorn]
 swagger_enabled = True
