@@ -28,6 +28,7 @@ def search_resource(
         service: MetadataService = Depends(container.get_metadata_service)
 ) -> Any:
     span = trace.get_current_span()
+    span.update_name(f"GET /resource/{resource_type}/_search?pseudonym={pseudonym}")
     span.set_attribute("data.pseudonym", str(pseudonym))
     span.set_attribute("data.resource_type", resource_type)
 
@@ -68,6 +69,11 @@ def get_resource(
         _pretty: bool = False,
         service: MetadataService = Depends(container.get_metadata_service)
 ) -> Any:
+    span = trace.get_current_span()
+    span.update_name(f"GET /resource/{resource_type}/{resource_id}")
+    span.set_attribute("data.resource_type", resource_type)
+    span.set_attribute("data.resource_id", resource_id)
+
     return get_resource_by_version(resource_type, resource_id, 0, service, _pretty)
 
 

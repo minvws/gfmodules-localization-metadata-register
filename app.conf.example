@@ -24,9 +24,9 @@ enabled = True
 # Endpoint to GRPC server for telemetry
 endpoint = http://tracing:4317
 # Service name to use
-service_name = localisation
+service_name = Lokalisatie Metadata Register
 # Tracer name to use
-tracer_name = zmodules.service.localisation
+tracer_name = zmodules.service.localisation_metadata_register
 
 [uvicorn]
 # If true, the api docs will be enabled
