@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "zmodules-metadata-service"
+name = "gfmodules-localization-metadata-register"
 version = "0.1.0"
 description = ""
 license = "EUPL-1.2"
 authors = ["Ministerie van Volksgezondheid, Welzijn en Sport"]
-repository = "https://github.com/minvws/nl-irealisatie-zmodules-metadata-register"
+repository = "https://github.com/minvws/gfmodules-localization-register-service"
 readme = "README.md"
 packages = [
     { include = "app" },

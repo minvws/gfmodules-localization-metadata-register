@@ -1,5 +1,10 @@
-# ZModules Metadata Service
+### Localization Metadata Register (LMR)
 
+The Localization Metadata Register is an addressable register that contains metadata of
+all the pseudonyms that it is responsible for. There are multiple metadata registers divided over
+the health landscape. In the end, all health data should have corresponding metadata available on one of the available
+metadata registers. The Metadata Register endpoints should be described in the Addressing Register.
+The LMR should contain entries for all the metadata in the Metadata Register.
 
 ## First run
 
