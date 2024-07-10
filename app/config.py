@@ -51,11 +51,18 @@ class ConfigTelemetry(BaseModel):
     tracer_name: str | None
 
 
+class ConfigStats(BaseModel):
+    enabled: bool = Field(default=False)
+    host: str | None
+    port: int | None
+
+
 class Config(BaseModel):
     app: ConfigApp
     database: ConfigDatabase
     uvicorn: ConfigUvicorn
     telemetry: ConfigTelemetry
+    stats: ConfigStats
 
 
 def read_ini_file(path: str) -> Any:

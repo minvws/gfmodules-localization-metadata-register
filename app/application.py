@@ -9,6 +9,7 @@ from starlette.responses import JSONResponse
 
 from app.container import setup_container
 from app.metadata.fhir import OperationOutcome, OperationOutcomeIssue, OperationOutcomeDetail
+from app.stats import setup_stats
 from app.telemetry import setup_telemetry
 from app.routers.default import router as default_router
 from app.routers.health import router as health_router
@@ -41,6 +42,9 @@ def run() -> None:
 def create_fastapi_app() -> FastAPI:
     application_init()
     fastapi = setup_fastapi()
+
+    if get_config().stats.enabled:
+        setup_stats()
 
     if get_config().telemetry.enabled:
         setup_telemetry(fastapi)
