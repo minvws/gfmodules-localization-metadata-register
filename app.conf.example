@@ -28,6 +28,14 @@ service_name = Lokalisatie Metadata Register
 # Tracer name to use
 tracer_name = zmodules.service.localisation_metadata_register
 
+[stats]
+# Statsd is enabled or not
+enabled = True
+# Host for statsd server
+host = 127.0.0.1
+# Port for statsd server
+port = 8125
+
 [uvicorn]
 # If true, the api docs will be enabled
 swagger_enabled = True

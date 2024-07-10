@@ -16,6 +16,11 @@ endpoint = http://tracing:4317
 service_name = Lokalisatie Metadata Register
 tracer_name = zmodules.service.localisation_metadata_register
 
+[stats]
+enabled = True
+host = 127.0.0.1
+port = 8125
+
 [uvicorn]
 swagger_enabled = True
 docs_url = /docs

@@ -13,6 +13,7 @@ from app.data import Pseudonym
 from app.metadata.fhir import convert_resource_to_fhir
 from app.metadata.metadata_service import MetadataService
 from app.metadata.validators.Validator import InvalidResourceError, ValidationError
+from app.stats import get_stats
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -31,6 +32,8 @@ def search_resource(
     span.update_name(f"GET /resource/{resource_type}/_search?pseudonym={pseudonym}")
     span.set_attribute("data.pseudonym", str(pseudonym))
     span.set_attribute("data.resource_type", resource_type)
+
+    get_stats().inc("http.get.resource.search")
 
     entry = service.search_by_pseudonym(pseudonym, resource_type)
 
@@ -56,6 +59,7 @@ def get_resource_history(
         _pretty: bool = False,
         service: MetadataService = Depends(container.get_metadata_service)
 ) -> Any:
+    get_stats().inc("http.get.resource.history")
     return get_resource_by_version(resource_type, resource_id, vid, service, _pretty)
 
 
@@ -69,6 +73,8 @@ def get_resource(
         _pretty: bool = False,
         service: MetadataService = Depends(container.get_metadata_service)
 ) -> Any:
+    get_stats().inc("http.get.resource")
+
     span = trace.get_current_span()
     span.update_name(f"GET /resource/{resource_type}/{resource_id}")
     span.set_attribute("data.resource_type", resource_type)
@@ -91,6 +97,8 @@ def put_resource(
     span = trace.get_current_span()
     span.set_attribute("data.resource_type", resource_type)
     span.set_attribute("data.resource_id", resource_id)
+
+    get_stats().inc("http.put.resource")
 
     try:
         entry = service.update(resource_type, resource_id, data, pseudonym)
@@ -131,6 +139,8 @@ def delete_resource(
     span.set_attribute("data.resource_type", resource_type)
     span.set_attribute("data.resource_id", resource_id)
 
+    get_stats().inc("http.delete.resource")
+
     entry = service.search(resource_type, resource_id, 0)
     if entry is None:
         raise HTTPException(status_code=404, detail="Metadata not found")
@@ -151,6 +161,8 @@ def patch_resource(
     span = trace.get_current_span()
     span.set_attribute("data.resource_type", resource_type)
     span.set_attribute("data.resource_id", resource_id)
+
+    get_stats().inc("http.patch.resource")
 
     # We do not support PATCH
     return Response(status_code=405)
