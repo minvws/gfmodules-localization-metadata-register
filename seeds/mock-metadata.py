@@ -2,7 +2,7 @@ import json
 import os
 import random
 from datetime import datetime, date
-from typing import Any
+from typing import Any, Tuple
 
 import requests
 from faker import Faker
@@ -65,25 +65,34 @@ def generate_mocks(pseudonym):
         f.write(json.dumps(patient.dict(), indent=4, cls=CustomJSONEncoder))
     store("Patient", patient_id, patient, pseudonym)
 
-
-    org = generate_organization()
-    org_id = org.identifier[0].value
-    with open(f"{path}/org-{org_id}.json", "w") as f:
-        f.write(json.dumps(org.dict(), indent=4, cls=CustomJSONEncoder))
-    store("Organization", org_id, org, pseudonym)
+    organization_names = ["De Ziekenboeg", "Huisartsenpost Bloedspoed", "Ziekthuis"]
+    organizations = []
+    for name in organization_names:
+        org = generate_organization(name)
+        org_id = org.identifier[0].value
+        organizations.append(org)
+        with open(f"{path}/org-{org_id}.json", "w") as f:
+            f.write(json.dumps(org.dict(), indent=4, cls=CustomJSONEncoder))
+        store("Organization", org_id, org, pseudonym)
 
     # Generate 10 practitioners
+    practitioner_names = [
+        ("Dokter", "Bibber"),
+        ("Zuster", "Bloedwijn"),
+        ("Oogarts", "Appel"),
+        ("Radioloog","Straal")
+    ]
     practitioners = []
-    for _ in range(10):
-        practitioner = generate_practitioner()
+    for name in practitioner_names:
+        practitioner = generate_practitioner(name)
         practitioner_id = practitioner.identifier[0].value
         with open(f"{path}/practitioner-{practitioner_id}.json", "w") as f:
             f.write(json.dumps(practitioner.dict(), indent=4, cls=CustomJSONEncoder))
         practitioners.append(practitioner)
         store("Practitioner", practitioner_id, practitioner, pseudonym)
 
-    for _ in range(fake.random_number(digits=1) + 1):
-        study = generate_imagestudy(patient, org, practitioners)
+    for _ in range(fake.random_number(digits=1) + 2):
+        study = generate_imagestudy(patient, organizations, practitioners)
         study_id = study.identifier[0].value
         with open(f"{path}/imagingstudy-{study_id}.json", "w") as f:
             f.write(json.dumps(study.dict(), indent=4, cls=CustomJSONEncoder))
@@ -139,7 +148,7 @@ def generate_patient():
     return patient
 
 
-def generate_practitioner():
+def generate_practitioner(name: Tuple[str]):
     uuid = fake.uuid4()
 
     practitioner = Practitioner(
@@ -157,15 +166,21 @@ def generate_practitioner():
             country='Netherlands'
         )],
         birthDate=fake.date_of_birth(),
+        name=[HumanName(
+            family=name[1],
+            given=[name[0]]
+        )]
     )
 
     return practitioner
 
 
-def generate_imagestudy(patient: Patient, org: Organization, practitioners: list[Practitioner]):
+def generate_imagestudy(patient: Patient, organizations: list[Organization], practitioners: list[Practitioner]):
     uuid = fake.uuid4()
 
     patient_id = patient.identifier[0].value
+
+    org = fake.random_element(elements=organizations)
     org_id = org.identifier[0].value
 
     series_count = fake.random_number(digits=1) + 1
@@ -177,7 +192,8 @@ def generate_imagestudy(patient: Patient, org: Organization, practitioners: list
             value=uuid
         )],
         subject=Reference(
-            reference=f"Patient/{patient_id}"
+            reference=f"Patient/{patient_id}",
+            display=patient.name[0].given[0] + ' ' + patient.name[0].family
         ),
         status=fake.random_element(elements=("registered", "available", "cancelled", "entered-in-error")),
         started=fake.date_time_this_decade(),
@@ -188,6 +204,7 @@ def generate_imagestudy(patient: Patient, org: Organization, practitioners: list
     for idx in range(series_count):
         practitioner = fake.random_element(elements=practitioners)
         practitioner_id = practitioner.identifier[0].value
+        body_part = fake.random_element(elements=(("head", "Hoofd"), ("chest", "Borst"), ("abdomen", "Buikholte"), ("pelvis", "Bekken")))
 
         study.series.append(ImagingStudySeriesType(
             uid=fake.uuid4(),
@@ -204,13 +221,15 @@ def generate_imagestudy(patient: Patient, org: Organization, practitioners: list
                 {
                     "actor": Reference(
                         reference=f"Practitioner/{practitioner_id}",
-                        type="Practitioner"
+                        type="Practitioner",
+                        display=practitioner.name[0].given[0] + " " + practitioner.name[0].family
                     ),
                 },
                 {
                     "actor": Reference(
                         reference=f"Organization/{org_id}",
-                        type="Organization"
+                        type="Organization",
+                        display=org.name
                     ),
                 }
             ],
@@ -218,8 +237,8 @@ def generate_imagestudy(patient: Patient, org: Organization, practitioners: list
                 concept=CodeableConcept(
                     coding=[Coding(
                         system="http://example.org/body-site",
-                        code=fake.random_element(elements=("head", "chest", "abdomen", "pelvis")),
-                        display=fake.random_element(elements=("Head", "Chest", "Abdomen", "Pelvis"))
+                        code=body_part[0],
+                        display=body_part[1]
                     )]
                 )
             ),
@@ -239,7 +258,7 @@ def generate_imagestudy(patient: Patient, org: Organization, practitioners: list
     return study
 
 
-def generate_organization():
+def generate_organization(name: str):
     uuid = fake.uuid4()
 
     org = Organization(
@@ -256,7 +275,7 @@ def generate_organization():
                 display=fake.random_element(elements=("Hospital", "Clinic", "Pharmacy", "Lab"))
             )]
         )],
-        name=fake.company(),
+        name=name
     )
 
     return org
