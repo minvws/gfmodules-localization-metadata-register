@@ -88,7 +88,7 @@ def get_resource(
             tags=["metadata"]
             )
 def put_resource(
-        pseudonym: Pseudonym,
+        pseudonym: str,
         resource_type: str,
         resource_id: str,
         data: Dict[str, Any] = Body(...),
@@ -97,14 +97,22 @@ def put_resource(
     span = trace.get_current_span()
     span.set_attribute("data.resource_type", resource_type)
     span.set_attribute("data.resource_id", resource_id)
+    span.set_attribute("data.pseudonym", pseudonym)
 
     get_stats().inc("http.put.resource")
 
     try:
-        entry = service.update(resource_type, resource_id, data, pseudonym)
+        pseudonym = Pseudonym(pseudonym)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Badly formed pseudonym")
+
+    try:
+        entry = service.update(resource_type, resource_id, data, Pseudonym(pseudonym))
     except InvalidResourceError as e:
+        logger.error(f"Invalid resource: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except ValidationError as e:
+        logger.error(f"Validation error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
     if entry is None:
