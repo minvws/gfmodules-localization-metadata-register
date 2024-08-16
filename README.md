@@ -6,32 +6,24 @@ the health landscape. In the end, all health data should have corresponding meta
 metadata registers. The Metadata Register endpoints should be described in the Addressing Register.
 The LMR should contain entries for all the metadata in the Metadata Register.
 
-## First run
-
-If you need to run the application without actual development, you can use the autopilot functionality. When this
-repository is checked out, just run the following command:
-
-```bash
-make autopilot
-```
-
-This will configure the whole system for you and you should be able to use the API right away at http://localhost:8503/docs
-
-
 ## Usage
 
 The application is a FastAPI application, so you can use the FastAPI documentation to see how to use the application.
 
 ## Development
 
-Build and run the application
+You can either run the application natively or in a docker container. If you want to run the application natively you
+can take a look at the initialisation steps in `docker/init.sh`. 
 
-Firstly, copy the `app.conf.example` to `app.conf` and adjust values when needed.
+The preferred way to run the application is through docker.
+
 If you run Linux, make sure you export your user ID and group ID to synchronize permissions with the Docker user.
 
+```
 export NEW_UID=$(id -u)
 export NEW_GID=$(id -g)
+```
 
-When you're ready, build the application with: make container-build.
+After this you can simply run `docker compose up`. 
 
-Run make up to start the application.
+The application will be available at https://localhost:8503 when the startup is completed.

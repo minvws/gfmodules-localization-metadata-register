@@ -24,6 +24,8 @@ def get_uvicorn_params() -> dict[str, Any]:
         "host": config.uvicorn.host,
         "port": config.uvicorn.port,
         "reload": config.uvicorn.reload,
+        "reload_delay": config.uvicorn.reload_delay,
+        "reload_dirs": config.uvicorn.reload_dirs,
     }
     if (config.uvicorn.use_ssl and
             config.uvicorn.ssl_base_dir is not None and
