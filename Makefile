@@ -10,9 +10,6 @@ endif
 .SILENT: help
 all: help
 
-autopilot: ## Runs the autopilot script for no-config setup of the project
-	./tools/autopilot.sh
-
 container-build: ## Build the container
 	docker compose build --build-arg="NEW_UID=${NEW_UID}" --build-arg="NEW_GID=${NEW_GID}"
 
