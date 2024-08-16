@@ -30,7 +30,6 @@ class ConfigDatabase(BaseModel):
     pool_pre_ping: bool = Field(default=False)
     pool_recycle: int = Field(default=3600, ge=0)
 
-
 class ConfigUvicorn(BaseModel):
     swagger_enabled: bool = Field(default=False)
     docs_url: str = Field(default="/docs")
@@ -38,6 +37,8 @@ class ConfigUvicorn(BaseModel):
     host: str = Field(default="0.0.0.0")
     port: int = Field(default=8503, gt=0, lt=65535)
     reload: bool = Field(default=True)
+    reload_delay: float = Field(default=1)
+    reload_dirs: list[str] = Field(default=["app"])
     use_ssl: bool = Field(default=False)
     ssl_base_dir: str | None
     ssl_cert_file: str | None
