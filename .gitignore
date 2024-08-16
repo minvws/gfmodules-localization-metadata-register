@@ -6,5 +6,4 @@ secrets/
 *.key
 *.priv
 *.pub
-.autopilot
 mocks
