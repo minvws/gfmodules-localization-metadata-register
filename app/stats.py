@@ -73,7 +73,6 @@ def setup_stats() -> None:
 
 def get_stats() -> Stats:
     global _STATS
-    print(_STATS)
     return _STATS
 
 
