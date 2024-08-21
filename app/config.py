@@ -56,6 +56,7 @@ class ConfigStats(BaseModel):
     enabled: bool = Field(default=False)
     host: str | None
     port: int | None
+    module_name: str | None
 
 
 class Config(BaseModel):

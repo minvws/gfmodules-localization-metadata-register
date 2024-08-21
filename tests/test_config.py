@@ -30,7 +30,8 @@ def get_test_config() -> Config:
         ),
         stats=ConfigStats(
             enabled=False,
-            host="",
-            port=0,
+            host=None,
+            port=None,
+            module_name=None
         )
     )

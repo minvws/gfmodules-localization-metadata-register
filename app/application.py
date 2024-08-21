@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 
 from app.container import setup_container
 from app.metadata.fhir import OperationOutcome, OperationOutcomeIssue, OperationOutcomeDetail
-from app.stats import setup_stats
+from app.stats import setup_stats, StatsdMiddleware
 from app.telemetry import setup_telemetry
 from app.routers.default import router as default_router
 from app.routers.health import router as health_router
@@ -100,6 +100,9 @@ def setup_fastapi() -> FastAPI:
     routers = [default_router, health_router, resource_router]
     for router in routers:
         fastapi.include_router(router)
+
+    if get_config().stats.enabled:
+        fastapi.add_middleware(StatsdMiddleware, module_name=get_config().stats.module_name)
 
     fastapi.add_exception_handler(Exception, default_fhir_exception_handler)
 
