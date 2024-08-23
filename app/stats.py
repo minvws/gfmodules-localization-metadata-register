@@ -85,7 +85,9 @@ class StatsdMiddleware(BaseHTTPMiddleware):
         self.module_name = module_name
 
     async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
-        key = f"{self.module_name}.http.request.{request.method.lower()}.{request.url.path}"
+        normalized_path = self.normalize_path(request)
+
+        key = f"{self.module_name}.http.request.{request.method.lower()}.{normalized_path}"
         get_stats().inc(key)
 
         start_time = time.monotonic()
@@ -96,5 +98,23 @@ class StatsdMiddleware(BaseHTTPMiddleware):
         get_stats().timing(f"{self.module_name}.http.response_time", response_time)
 
         return response
+
+    @staticmethod
+    def normalize_path(request: Request) -> str:
+        """
+        Normalize the path to remove resource IDs. This makes it easier to group similar requests together in the stats
+        """
+        if not request.url.path.startswith("/resource/"):
+            return request.url.path
+
+        parts = request.url.path.split("/")
+
+        if len(parts) >= 4 and parts[3] != "_search":
+            parts[3] = "%resource_id%"  # Remove Resource ID
+        if len(parts) >= 5 and parts[4] == "_history":
+            parts[5] = "%version_id%"  # Remove Version ID
+        return '/'.join(parts)
+
+
 
 
