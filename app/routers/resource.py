@@ -102,12 +102,9 @@ def put_resource(
     get_stats().inc("http.put.resource")
 
     try:
-        pseudonym = Pseudonym(pseudonym)
+        entry = service.update(resource_type, resource_id, data, Pseudonym(pseudonym))
     except ValueError:
         raise HTTPException(status_code=400, detail="Badly formed pseudonym")
-
-    try:
-        entry = service.update(resource_type, resource_id, data, Pseudonym(pseudonym))
     except InvalidResourceError as e:
         logger.error(f"Invalid resource: {e}")
         raise HTTPException(status_code=400, detail=str(e))
