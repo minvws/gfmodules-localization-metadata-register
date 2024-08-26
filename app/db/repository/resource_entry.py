@@ -62,7 +62,7 @@ class ResourceEntryRepository(RepositoryBase):
             # Create a new resource entry instance with the next version
             entry = ResourceEntry(
                 id=uuid.uuid4(),
-                pseudonym=pseudonym,
+                pseudonym=uuid.UUID(str(pseudonym)),
                 resource_type=resource_type,
                 resource_id=resource_id,
                 resource=data,

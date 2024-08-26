@@ -90,8 +90,8 @@ class TestApi(unittest.TestCase):
             json={"resourceType": "Patient"},
             params={"pseudonym": "foo"}
         )
-        assert response.status_code == 422
-        assert "Input should be a valid UUID" in response.json()['detail'][0]['msg']
+        assert response.status_code == 400
+        assert response.json()['detail'] == "Badly formed pseudonym"
 
     def put_resource_fail5(self) -> None:
         # No pseudonym in the params
