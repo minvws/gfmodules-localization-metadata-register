@@ -9,10 +9,13 @@ from opentelemetry import trace
 from starlette.responses import Response
 
 from app import container
+from app.config import get_config
 from app.data import Pseudonym
 from app.metadata.fhir import convert_resource_to_fhir
 from app.metadata.metadata_service import MetadataService
 from app.metadata.validators.Validator import InvalidResourceError, ValidationError
+from app.services.pseudonym_service import PseudonymService
+from app.stats import get_stats
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -23,16 +26,20 @@ router = APIRouter()
             tags=["metadata"]
             )
 def search_resource(
-        pseudonym: Pseudonym,
+        pseudonym: str,
         resource_type: str,
-        service: MetadataService = Depends(container.get_metadata_service)
+        service: MetadataService = Depends(container.get_metadata_service),
+        pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service)
 ) -> Any:
     span = trace.get_current_span()
     span.update_name(f"GET /resource/{resource_type}/_search?pseudonym={pseudonym}")
-    span.set_attribute("data.pseudonym", str(pseudonym))
+    span.set_attribute("data.pseudonym", pseudonym)
     span.set_attribute("data.resource_type", resource_type)
 
-    entry = service.search_by_pseudonym(pseudonym, resource_type)
+    get_stats().inc("http.get.resource.search")
+
+    p = pseudonym_service.exchange(Pseudonym(pseudonym), get_config().app.provider_id)
+    entry = service.search_by_pseudonym(p, resource_type)
 
     bundle = Bundle(  # type: ignore
         resource_type="Bundle",
@@ -86,7 +93,8 @@ def put_resource(
         resource_type: str,
         resource_id: str,
         data: Dict[str, Any] = Body(...),
-        service: MetadataService = Depends(container.get_metadata_service)
+        service: MetadataService = Depends(container.get_metadata_service),
+        pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service)
 ) -> Any:
     span = trace.get_current_span()
     span.set_attribute("data.resource_type", resource_type)
@@ -94,7 +102,8 @@ def put_resource(
     span.set_attribute("data.pseudonym", pseudonym)
 
     try:
-        entry = service.update(resource_type, resource_id, data, Pseudonym(pseudonym))
+        p = pseudonym_service.exchange(Pseudonym(pseudonym), get_config().app.provider_id)
+        entry = service.update(resource_type, resource_id, data, p)
     except ValueError:
         raise HTTPException(status_code=400, detail="Badly formed pseudonym")
     except InvalidResourceError as e:
