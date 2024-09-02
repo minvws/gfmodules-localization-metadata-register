@@ -36,9 +36,9 @@ class ConfigPseudonymApi(BaseModel):
     mock: bool = Field(default=False)
     endpoint: str
     timeout: int = Field(default=30, gt=0)
-    mtls_cert: str | None
-    mtls_key: str | None
-    mtls_ca: str | None
+    mtls_cert: str | None = Field(default = None)
+    mtls_key: str | None = Field(default = None)
+    mtls_ca: str | None = Field(default = None)
 
 
 class ConfigUvicorn(BaseModel):

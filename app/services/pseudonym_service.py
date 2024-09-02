@@ -21,7 +21,7 @@ class PseudonymServiceInterface(ABC):
 
 
 class PseudonymService(PseudonymServiceInterface):
-    def __init__(self, endpoint: str, timeout: int, mtls_cert: str, mtls_key: str, mtls_ca: str):
+    def __init__(self, endpoint: str, timeout: int, mtls_cert: str|None, mtls_key: str|None, mtls_ca: str|None):
         self.endpoint = endpoint
         self.timeout = timeout
         self.mtls_cert = mtls_cert
@@ -39,8 +39,8 @@ class PseudonymService(PseudonymServiceInterface):
                     "target_provider_id": str(provider_id)
                 },
                 timeout=self.timeout,
-                cert=(self.mtls_cert, self.mtls_key),
-                verify=self.mtls_ca
+                cert=(self.mtls_cert, self.mtls_key) if self.mtls_cert and self.mtls_key else None,
+                verify=self.mtls_ca if self.mtls_ca else True
             )
         except (Exception, HTTPError) as e:
             raise PseudonymError(f"Failed to exchange pseudonym: {e}")
