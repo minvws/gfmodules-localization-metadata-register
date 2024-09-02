@@ -65,6 +65,7 @@ def generate_mocks(pseudonym):
         f.write(json.dumps(patient.dict(), indent=4, cls=CustomJSONEncoder))
     store("Patient", patient_id, patient, pseudonym)
 
+
     organization_names = ["De Ziekenboeg", "Huisartsenpost Bloedspoed", "Ziekthuis"]
     organizations = []
     for name in organization_names:

@@ -4,6 +4,7 @@ from app.config import get_config
 from app.db.db import Database
 from app.metadata.metadata_service import MetadataService
 from app.metadata.db.db_adapter import DbMetadataAdapter
+from app.services.pseudonym_service import PseudonymService, PseudonymServiceInterface, MockPseudonymService
 
 
 def container_config(binder: inject.Binder) -> None:
@@ -15,6 +16,18 @@ def container_config(binder: inject.Binder) -> None:
     metadata_service = MetadataService(DbMetadataAdapter(db))
     binder.bind(MetadataService, metadata_service)
 
+    if config.pseudonym_api.mock:
+        binder.bind(PseudonymServiceInterface, MockPseudonymService())
+    else:
+        pseudonym_service = PseudonymService(
+            endpoint=config.pseudonym_api.endpoint,
+            timeout=config.pseudonym_api.timeout,
+            mtls_cert=config.pseudonym_api.mtls_cert if config.pseudonym_api.mtls_cert else "",
+            mtls_key=config.pseudonym_api.mtls_key if config.pseudonym_api.mtls_key else "",
+            mtls_ca=config.pseudonym_api.mtls_ca if config.pseudonym_api.mtls_ca else ""
+        )
+        binder.bind(PseudonymServiceInterface, pseudonym_service)
+
 
 def get_database() -> Database:
     return inject.instance(Database)
@@ -22,6 +35,10 @@ def get_database() -> Database:
 
 def get_metadata_service() -> MetadataService:
     return inject.instance(MetadataService)
+
+
+def get_pseudonym_service() -> PseudonymServiceInterface:
+    return inject.instance(PseudonymServiceInterface)   # type: ignore
 
 
 def setup_container() -> None:

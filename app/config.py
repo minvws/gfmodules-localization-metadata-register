@@ -19,6 +19,7 @@ class LogLevel(str, Enum):
 
 class ConfigApp(BaseModel):
     loglevel: LogLevel = Field(default=LogLevel.info)
+    provider_id: str
 
 
 class ConfigDatabase(BaseModel):
@@ -29,6 +30,16 @@ class ConfigDatabase(BaseModel):
     max_overflow: int = Field(default=10, ge=0, lt=100)
     pool_pre_ping: bool = Field(default=False)
     pool_recycle: int = Field(default=3600, ge=0)
+
+
+class ConfigPseudonymApi(BaseModel):
+    mock: bool = Field(default=False)
+    endpoint: str
+    timeout: int = Field(default=30, gt=0)
+    mtls_cert: str | None
+    mtls_key: str | None
+    mtls_ca: str | None
+
 
 class ConfigUvicorn(BaseModel):
     swagger_enabled: bool = Field(default=False)
@@ -62,6 +73,7 @@ class ConfigStats(BaseModel):
 class Config(BaseModel):
     app: ConfigApp
     database: ConfigDatabase
+    pseudonym_api: ConfigPseudonymApi
     uvicorn: ConfigUvicorn
     telemetry: ConfigTelemetry
     stats: ConfigStats
