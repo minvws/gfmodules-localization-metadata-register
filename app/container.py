@@ -38,7 +38,7 @@ def get_metadata_service() -> MetadataService:
 
 
 def get_pseudonym_service() -> PseudonymServiceInterface:
-    return inject.instance(PseudonymServiceInterface)
+    return inject.instance(PseudonymServiceInterface)   # type: ignore
 
 
 def setup_container() -> None:
