@@ -22,9 +22,9 @@ def container_config(binder: inject.Binder) -> None:
         pseudonym_service = PseudonymService(
             endpoint=config.pseudonym_api.endpoint,
             timeout=config.pseudonym_api.timeout,
-            mtls_cert=config.pseudonym_api.mtls_cert if config.pseudonym_api.mtls_cert else "",
-            mtls_key=config.pseudonym_api.mtls_key if config.pseudonym_api.mtls_key else "",
-            mtls_ca=config.pseudonym_api.mtls_ca if config.pseudonym_api.mtls_ca else ""
+            mtls_cert=config.pseudonym_api.mtls_cert,
+            mtls_key=config.pseudonym_api.mtls_key,
+            mtls_ca=config.pseudonym_api.mtls_ca,
         )
         binder.bind(PseudonymServiceInterface, pseudonym_service)
 
