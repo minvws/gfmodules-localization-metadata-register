@@ -1,6 +1,8 @@
 [app]
 # Loglevel can be one of: debug, info, warning, error, critical
 loglevel=debug
+# Provider ID of this metadata service
+provider_id=d058e1e8-e4a2-4918-9ded-19dfb81fdc4f
 
 [database]
 # Dsn for database connection
