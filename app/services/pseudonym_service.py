@@ -1,5 +1,6 @@
 import logging
 import uuid
+from abc import ABC, abstractmethod
 
 import requests
 from requests import HTTPError
@@ -13,9 +14,8 @@ class PseudonymError(Exception):
     pass
 
 
-from abc import ABC
 class PseudonymServiceInterface(ABC):
-    @abstractbasemethod
+    @abstractmethod
     def exchange(self, pseudonym: Pseudonym, provider_id: str) -> Pseudonym:
         raise NotImplementedError
 
