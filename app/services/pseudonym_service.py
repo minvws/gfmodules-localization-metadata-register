@@ -13,7 +13,9 @@ class PseudonymError(Exception):
     pass
 
 
-class PseudonymServiceInterface:
+from abc import ABC
+class PseudonymServiceInterface(ABC):
+    @abstractbasemethod
     def exchange(self, pseudonym: Pseudonym, provider_id: str) -> Pseudonym:
         raise NotImplementedError
 
