@@ -18,7 +18,7 @@ class MetadataAdapter(Protocol):
     def delete(self, resource_type: str, resource_id: str) -> None:
         ...
 
-    def update(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym) -> ResourceEntry | None:
+    def update(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym|None) -> ResourceEntry | None:
         ...
 
 
@@ -67,6 +67,6 @@ class MetadataService:
     def delete(self, resource_type: str, resource_id: str) -> None:
         return self.adapter.delete(resource_type, resource_id)
 
-    def update(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym) -> ResourceEntry | None:
+    def update(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym|None) -> ResourceEntry | None:
         validate_resource(resource_type, resource_id, data)
         return self.adapter.update(resource_type, resource_id, data, pseudonym)

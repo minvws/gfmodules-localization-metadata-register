@@ -42,12 +42,12 @@ class ResourceEntryRepository(RepositoryBase):
         self.db_session.execute(stmt)
         self.db_session.commit()
 
-    def upsert(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym) -> ResourceEntry | None:
+    def upsert(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym|None) -> ResourceEntry | None:
         with self.db_session.begin():
-            # Create a new resource entry instance with the next version
+            # Create a new resource entry instance, assume version is 1
             entry = ResourceEntry(
                 id=uuid.uuid4(),
-                pseudonym=uuid.UUID(str(pseudonym)),
+                pseudonym=uuid.UUID(str(pseudonym)) if pseudonym else None,
                 resource_type=resource_type,
                 resource_id=resource_id,
                 resource=data,
@@ -56,25 +56,43 @@ class ResourceEntryRepository(RepositoryBase):
                 deleted=False,
             )
 
-            subquery = (
-                self.db_session.query(func.coalesce(func.max(ResourceEntry.version), 0) + 1)
-                .filter(ResourceEntry.resource_id == resource_id and ResourceEntry.resource_type == resource_type)
-            ).scalar_subquery()
+            if "postgresql" in self.db_session.get_dialect():
+                subquery = (
+                    self.db_session.query(func.coalesce(func.max(ResourceEntry.version), 0) + 1)
+                    .filter(ResourceEntry.resource_id == resource_id and ResourceEntry.resource_type == resource_type)
+                ).scalar_subquery()
 
-            from sqlalchemy.dialects.postgresql import insert
-            insert_stmt = insert(ResourceEntry).values(
-                id=entry.id,
-                pseudonym=entry.pseudonym,
-                resource_type=entry.resource_type,
-                resource_id=entry.resource_id,
-                resource=entry.resource,
-                version=entry.version,
-                created_dt=entry.created_dt,
-                deleted=entry.deleted
-            ).on_conflict_do_update(
-                constraint='resource_type_id',
-                set_ = { 'version': subquery }
-            )
-            self.db_session.execute(insert_stmt)
+                from sqlalchemy.dialects.postgresql import insert
+                insert_stmt = insert(ResourceEntry).values(
+                    id=entry.id,
+                    pseudonym=entry.pseudonym,
+                    resource_type=entry.resource_type,
+                    resource_id=entry.resource_id,
+                    resource=entry.resource,
+                    version=entry.version,
+                    created_dt=entry.created_dt,
+                    deleted=entry.deleted
+                ).on_conflict_do_update(
+                    constraint='resource_type_id',
+                    set_ = { 'version': subquery }
+                )
+                result = self.db_session.scalars(
+                    insert_stmt.returning(ResourceEntry), execution_options={"populate_existing": True}
+                )
+                return result.first()   # type: ignore
 
-            return entry
+            if "sqlite" in self.db_session.get_dialect():
+                # Sqlite does not support on conflict do update, so we need to manually check the version
+                stmt = (select(func.max(ResourceEntry.version))
+                        .where(ResourceEntry.resource_type.ilike(resource_type))
+                        .where(ResourceEntry.resource_id.ilike(resource_id)))
+                result = self.db_session.execute(stmt)
+                max_version = result.scalar()
+                entry.version = (max_version or 0) + 1
+
+                self.db_session.add(entry)
+                self.db_session.commit()
+
+                return entry
+
+            raise Exception("Unsupported database dialect")

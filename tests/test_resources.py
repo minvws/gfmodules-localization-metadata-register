@@ -42,7 +42,6 @@ class TestApi(unittest.TestCase):
         self.put_resource_fail2()
         self.put_resource_fail3()
         self.put_resource_fail4()
-        self.put_resource_fail5()
         self.put_resource_fail6()
         self.put_resource_fail7()
         self.get_resource1()
@@ -93,18 +92,6 @@ class TestApi(unittest.TestCase):
         assert response.status_code == 400
         assert response.json()['detail'] == "Badly formed pseudonym"
 
-    def put_resource_fail5(self) -> None:
-        # No pseudonym in the params
-        response = client.put(
-            url=f"/resource/patient/{self.PATIENT_ID_1}",
-            json={"resourceType": "Patient"},
-            params={}
-        )
-        assert response.status_code == 422
-        assert "Field required" in response.json()['detail'][0]['msg']
-        assert "query" in response.json()['detail'][0]['loc'][0]
-        assert "pseudonym" in response.json()['detail'][0]['loc'][1]
-
     def put_resource_fail6(self) -> None:
         # Put resource with incorrect id
         response = client.put(
@@ -122,6 +109,7 @@ class TestApi(unittest.TestCase):
             content=self.get_patient_resource_json(self.PATIENT_ID_1),
             params={"pseudonym": self.PSEUDONYM_1}
         )
+
         assert response.status_code == 201  # Resource created
         assert response.json()['resourceType'] == "Patient"
         assert response.json()['id'] == self.PATIENT_ID_1

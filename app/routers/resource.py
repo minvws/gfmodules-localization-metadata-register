@@ -2,7 +2,7 @@ import logging
 import uuid
 from typing import Any, Dict
 
-from fastapi import APIRouter, HTTPException, Depends, Body
+from fastapi import APIRouter, HTTPException, Depends, Body, Query
 from fhir.resources.bundle import BundleEntry, Bundle
 from fhir.resources.fhirtypes import Code, UnsignedInt, Id
 from opentelemetry import trace
@@ -89,9 +89,9 @@ def get_resource(
             tags=["metadata"]
             )
 def put_resource(
-        pseudonym: str,
         resource_type: str,
         resource_id: str,
+        pseudonym: str = Query(required=False, default=None, description="Pseudonym to use for the resource"),
         data: Dict[str, Any] = Body(...),
         service: MetadataService = Depends(container.get_metadata_service),
         pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service)
@@ -101,11 +101,15 @@ def put_resource(
     span.set_attribute("data.resource_id", resource_id)
     span.set_attribute("data.pseudonym", pseudonym)
 
+    p = None
+    if pseudonym is not None:
+        try:
+            p = pseudonym_service.exchange(Pseudonym(pseudonym), get_config().app.provider_id)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Badly formed pseudonym")
+
     try:
-        p = pseudonym_service.exchange(Pseudonym(pseudonym), get_config().app.provider_id)
         entry = service.update(resource_type, resource_id, data, p)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Badly formed pseudonym")
     except InvalidResourceError as e:
         logger.error(f"Invalid resource: {e}")
         raise HTTPException(status_code=400, detail=str(e))

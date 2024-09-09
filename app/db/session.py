@@ -147,3 +147,9 @@ class DbSession:
         Create a new query object
         """
         return self.session.query(*entities)
+
+    def scalars(self, stmt: Any, execution_options: Any) -> Any:
+        """
+        Execute a statement and return a scalar result
+        """
+        return self.session.scalars(stmt, execution_options=execution_options)
