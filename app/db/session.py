@@ -12,7 +12,7 @@ from app.db.models import Base
 from app.db.repository import TRepositoryBase, RepositoryBase
 
 """
-This module contains the DbSession class, which is a context manager that provides a session to interact with 
+This module contains the DbSession class, which is a context manager that provides a session to interact with
 the database. It also provides methods to add and delete resources from the session, and to commit or rollback the
 current transaction.
 
@@ -22,7 +22,7 @@ Usage:
         repo = session.get_repository(MyModelRepository)
         repo.find_all()
         session.add(MyModel())
-        session.commit()       
+        session.commit()
 """
 
 logger = logging.getLogger(__name__)
@@ -141,3 +141,9 @@ class DbSession:
             logger.info("Retrying operation in %s seconds", backoff[0])
             sleep(backoff[0] + random.uniform(0, 0.1) )
             backoff = backoff[1:]
+
+    def query(self, *entities: Any) -> Any:
+        """
+        Create a new query object
+        """
+        return self.session.query(*entities)
