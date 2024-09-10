@@ -61,7 +61,7 @@ class DbMetadataAdapter(MetadataAdapter):
 
             resource_repository.delete_by_resource(resource_type, resource_id)
 
-    def update(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym) -> ResourceEntry | None:
+    def update(self, resource_type: str, resource_id: str, data: dict[str, Any], pseudonym: Pseudonym|None) -> ResourceEntry | None:
         """
         Update metadata for a resource
         """
