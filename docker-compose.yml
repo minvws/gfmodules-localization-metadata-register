@@ -1,36 +1,40 @@
 version: "3.5"
 
 services:
-    app:
-        build:
-            context: .
-            args:
-                NEW_UID: ${NEW_UID:-1000}
-                NEW_GID: ${NEW_GID:-1000}
-            dockerfile: docker/Dockerfile
-        volumes:
-            - ./:/src
-        ports:
-            - 8503:8503
-        depends_on:
-            -   metadata_db
-        networks:
-            zmodules:
-                aliases:
-                    - metadata
+  app:
+    build:
+      context: .
+      args:
+        NEW_UID: ${NEW_UID:-1000}
+        NEW_GID: ${NEW_GID:-1000}
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./:/src
+    ports:
+      - 8503:8503
+    depends_on:
+      metadata_db:
+        condition: service_healthy
+    networks:
+      zmodules:
+        aliases:
+          - metadata
 
-    metadata_db:
-        image: postgres:14
-        environment:
-            POSTGRES_DB: postgres
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
-        ports:
-            - 5403:5432
-        networks:
-            - zmodules
-
-
+  metadata_db:
+    image: postgres:14
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --user postgres"]
+      interval: 5s
+      retries: 5
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5403:5432
+    networks:
+      - zmodules
 
 networks:
   zmodules:

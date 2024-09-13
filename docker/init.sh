@@ -2,17 +2,12 @@
 
 set -e
 
-DB_STARTUP_WAIT=1
-
 DB_HOST=${1}
 DB_USER=${2:-postgres}
 DB_PASS=${3:-postgres}
 DB_NAME=${4:-postgres}
 
 export PGPASSWORD=$DB_PASS
-
-echo "Waiting for db container to finish startup"
-sleep $DB_STARTUP_WAIT
 
 echo "➡️ Generating TLS certificates"
 if [ -e secrets/ssl/server.key ] && [ -e secrets/ssl/server.cert ]; then
