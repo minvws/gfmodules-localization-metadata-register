@@ -44,6 +44,7 @@ class TestApi(unittest.TestCase):
         self.put_resource_fail4()
         self.put_resource_fail6()
         self.put_resource_fail7()
+        self.put_resource_fail8()
         self.get_resource1()
         # @TODO: We can find all resources for all pseudonyms
         # self.get_resource2()
@@ -125,6 +126,24 @@ class TestApi(unittest.TestCase):
         assert response.json()['id'] == self.PATIENT_ID_1
         assert response.headers['ETag'] == "2"
 
+    def put_resource_fail8(self) -> None:
+        response = client.put(
+            url=f"/resource/patient/{self.PATIENT_ID_1}",
+            json={"resourceType": "Patient", "id": f"{self.PATIENT_ID_1}"},
+            params={"pseudonym": self.PSEUDONYM_1},
+            headers={"If-Match": "2"}
+        )
+        assert response.headers['ETag'] == "3"
+        assert response.status_code == 200
+
+        response = client.put(
+            url=f"/resource/patient/{self.PATIENT_ID_1}",
+            json={"resourceType": "Patient", "id": f"{self.PATIENT_ID_1}"},
+            params={"pseudonym": self.PSEUDONYM_1},
+            headers={"If-Match": "2"} # Using same if match but ETag and version are both 3
+        )
+        assert response.status_code == 412
+
     def get_resource1(self) -> None:
         # Get resource with correct pseudonym
         response = client.get(
@@ -135,7 +154,7 @@ class TestApi(unittest.TestCase):
         assert response.json()['resourceType'] == "Patient"
         assert response.json()['id'] == self.PATIENT_ID_1
         assert response.headers['Content-Type'] == "application/fhir+json"
-        assert response.headers['ETag'] == "2"
+        assert response.headers['ETag'] == "3"
 
     def get_resource2(self) -> None:
         # Get resource with incorrect pseudonym
@@ -180,9 +199,9 @@ class TestApi(unittest.TestCase):
         assert response.headers['Content-Type'] == "application/fhir+json"
         assert response.headers['ETag'] == "2"
 
-        # Get history of resource v3 (not found)
+        # Get history of resource v4 (not found)
         response = client.get(
-            url=f"/resource/patient/{self.PATIENT_ID_1}/_history/3",
+            url=f"/resource/patient/{self.PATIENT_ID_1}/_history/4",
             params={"pseudonym": self.PSEUDONYM_1}
         )
         assert response.status_code == 404

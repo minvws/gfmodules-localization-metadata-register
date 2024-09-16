@@ -1,8 +1,8 @@
 import logging
 import uuid
-from typing import Any, Dict
+from typing import Any, Dict, Annotated
 
-from fastapi import APIRouter, HTTPException, Depends, Body, Query
+from fastapi import APIRouter, HTTPException, Depends, Body, Query, Header
 from fhir.resources.bundle import BundleEntry, Bundle
 from fhir.resources.fhirtypes import Code, UnsignedInt, Id
 from opentelemetry import trace
@@ -94,7 +94,8 @@ def put_resource(
         pseudonym: str = Query(required=False, default=None, description="Pseudonym to use for the resource"),
         data: Dict[str, Any] = Body(...),
         service: MetadataService = Depends(container.get_metadata_service),
-        pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service)
+        pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service),
+        if_match: Annotated[str | None, Header()] = None
 ) -> Any:
     span = trace.get_current_span()
     span.set_attribute("data.resource_type", resource_type)
@@ -107,6 +108,18 @@ def put_resource(
             p = pseudonym_service.exchange(Pseudonym(pseudonym), get_config().app.provider_id)
         except ValueError:
             raise HTTPException(status_code=400, detail="Badly formed pseudonym")
+
+    try:
+        resource = service.search(resource_type, resource_id, 0)
+        if resource is not None and if_match is not None and resource.version != int(if_match):
+            logger.error("If-match header mismatch with resource version")
+            raise HTTPException(status_code=412, detail="Precondition Failed: Version mismatch")
+    except InvalidResourceError as e:
+        logger.error(f"Invalid resource: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except ValidationError as e:
+        logger.error(f"Validation error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
 
     try:
         entry = service.update(resource_type, resource_id, data, p)
