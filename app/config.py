@@ -30,6 +30,14 @@ class ConfigDatabase(BaseModel):
     max_overflow: int = Field(default=10, ge=0, lt=100)
     pool_pre_ping: bool = Field(default=False)
     pool_recycle: int = Field(default=3600, ge=0)
+    
+
+class ConfigNVIAPI(BaseModel):
+    mock: bool = Field(default=False)
+    endpoint: str
+    mtls_cert: str | None = Field(default = None)
+    mtls_key: str | None = Field(default = None)
+    mtls_ca: str | None = Field(default = None)
 
 
 class ConfigPseudonymApi(BaseModel):
@@ -74,6 +82,7 @@ class Config(BaseModel):
     app: ConfigApp
     database: ConfigDatabase
     pseudonym_api: ConfigPseudonymApi
+    nvi_api: ConfigNVIAPI
     uvicorn: ConfigUvicorn
     telemetry: ConfigTelemetry
     stats: ConfigStats

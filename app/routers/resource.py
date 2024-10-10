@@ -10,10 +10,12 @@ from starlette.responses import Response
 
 from app import container
 from app.config import get_config
-from app.data import Pseudonym
+from app.data import DataDomain, Pseudonym, UraNumber
 from app.metadata.fhir import convert_resource_to_fhir
 from app.metadata.metadata_service import MetadataService
 from app.metadata.validators.Validator import InvalidResourceError, ValidationError
+from app.services.models.create_referral_request_body import CreateReferralRequestBody
+from app.services.nvi_api_service import NVIAPIServiceInterface
 from app.services.pseudonym_service import PseudonymService
 from app.stats import get_stats
 
@@ -95,17 +97,25 @@ def put_resource(
         data: Dict[str, Any] = Body(...),
         service: MetadataService = Depends(container.get_metadata_service),
         pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service),
+        nvi_api_service: NVIAPIServiceInterface = Depends(container.get_nvi_service),
         if_match: Annotated[str | None, Header()] = None
 ) -> Any:
+
     span = trace.get_current_span()
     span.set_attribute("data.resource_type", resource_type)
     span.set_attribute("data.resource_id", resource_id)
     span.set_attribute("data.pseudonym", pseudonym)
 
-    p = None
+    application_pseudonym = None
+    
+    # Previously, the ura_number was called 'provider_id'
+    # https://github.com/minvws/gfmodules-national-referral-index/commit/ae71b98a4e95d176047206a4c10b8ab6d98763ad
+    ura_number = get_config().app.provider_id
+    
     if pseudonym is not None:
         try:
-            p = pseudonym_service.exchange(Pseudonym(pseudonym), get_config().app.provider_id)
+            typed_pseudonym = Pseudonym(pseudonym)
+            application_pseudonym = pseudonym_service.exchange(typed_pseudonym, ura_number)
         except ValueError:
             raise HTTPException(status_code=400, detail="Badly formed pseudonym")
 
@@ -122,7 +132,19 @@ def put_resource(
         raise HTTPException(status_code=400, detail=str(e))
 
     try:
-        entry = service.update(resource_type, resource_id, data, p)
+        entry = service.update(resource_type, resource_id, data, application_pseudonym)
+        
+        
+        if application_pseudonym is not None:
+            referral = CreateReferralRequestBody(
+                pseudonym=typed_pseudonym,
+                data_domain=DataDomain.BeeldBank,
+                ura_number=UraNumber(ura_number),
+                
+                # If defined how authentication should work, define the uzi number here
+                requesting_uzi_number="00000000"
+            )
+            nvi_api_service.create_referral(referral)
     except InvalidResourceError as e:
         logger.error(f"Invalid resource: {e}")
         raise HTTPException(status_code=400, detail=str(e))

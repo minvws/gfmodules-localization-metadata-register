@@ -5,7 +5,7 @@ from typing import Optional, Any
 
 
 # DataDomain definitions
-class DataDomain(Enum):
+class DataDomain(str, Enum):
     Unknown = 'unknown'
     BeeldBank = 'beeldbank'
     Medicatie = 'medicatie'
