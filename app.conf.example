@@ -20,6 +20,13 @@ pool_pre_ping=False
 # Recycle the connection after this time (in seconds)
 pool_recycle=1800
 
+[nvi_api]
+endpoint=http://localhost:8501
+# Mtls configuration (if any)
+# mtls_cert=secrets/ssl/pseudonym_api.cert
+# mtls_key=secrets/ssl/pseudonym_api.key
+# mtls_ca=secrets/ssl/pseudonym_api_ca.cert
+
 [pseudonym_api]
 # Set to True when using the mock server
 mock=False
@@ -31,6 +38,7 @@ timeout=10
 # mtls_cert=secrets/ssl/pseudonym_api.cert
 # mtls_key=secrets/ssl/pseudonym_api.key
 # mtls_ca=secrets/ssl/pseudonym_api_ca.cert
+
 
 [telemetry]
 # Telemetry is enabled or not

@@ -1,5 +1,6 @@
 import unittest
 from typing import Any
+import uuid
 
 from fhir.resources.fhirtypes import Code, Date, Id, IdentifierType, HumanNameType
 from fhir.resources.patient import Patient
@@ -18,8 +19,9 @@ client = TestClient(app)
 class TestApi(unittest.TestCase):
     PATIENT_ID_1 = "123"
     PATIENT_ID_2 = "126"
-    PSEUDONYM_1 = "65e2f8e6-0709-4bbf-b4b2-0a6c47ffafb5"
-    PSEUDONYM_2 = "814188e5-8869-4311-a1aa-2dc068f0fdb6"
+    PSEUDONYM_1 = str(uuid.uuid4())
+    PSEUDONYM_2 = str(uuid.uuid4())
+
 
     def test_main(self) -> None:
         # Main page retrieval
@@ -88,7 +90,7 @@ class TestApi(unittest.TestCase):
         response = client.put(
             url=f"/resource/patient/{self.PATIENT_ID_1}",
             json={"resourceType": "Patient"},
-            params={"pseudonym": "foo"}
+            params={"pseudonym": 'foo'}
         )
         assert response.status_code == 400
         assert response.json()['detail'] == "Badly formed pseudonym"
