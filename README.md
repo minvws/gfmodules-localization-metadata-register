@@ -9,6 +9,11 @@ The LMR should contain entries for all the metadata in the Metadata Register.
 At this moment, the LMR only supports FHIR ImaginStudy as part of PoC. Further resources
 will be added to the application in consultation with other parties in the field
 
+## Disclaimer
+
+This application is currently in a PoC stage and currently under development.
+It is not intended yet to be used in a production like manner.
+
 ## Usage
 
 The application is a FastAPI application, so you can use the FastAPI documentation to see how to use the application.
