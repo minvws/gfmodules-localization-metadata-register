@@ -6,6 +6,15 @@ the health landscape. In the end, all health data should have corresponding meta
 metadata registers. The Metadata Register endpoints should be described in the Addressing Register.
 The LMR should contain entries for all the metadata in the Metadata Register.
 
+At this moment, the LMR only supports [FHIR ImaginStudy](https://hl7.org/fhir/R4/imagingstudy.html)
+as part of a PoC. Further resources will be added to the application in consultation
+with other parties in the field
+
+## Disclaimer
+
+This application is currently in a PoC stage and currently under development.
+It is not intended yet to be used in a production like manner.
+
 ## Usage
 
 The application is a FastAPI application, so you can use the FastAPI documentation to see how to use the application.
@@ -13,7 +22,7 @@ The application is a FastAPI application, so you can use the FastAPI documentati
 ## Development
 
 You can either run the application natively or in a docker container. If you want to run the application natively you
-can take a look at the initialisation steps in `docker/init.sh`. 
+can take a look at the initialisation steps in `docker/init.sh`.
 
 The preferred way to run the application is through docker.
 
@@ -24,6 +33,6 @@ export NEW_UID=$(id -u)
 export NEW_GID=$(id -g)
 ```
 
-After this you can simply run `docker compose up`. 
+After this you can simply run `docker compose up`.
 
-The application will be available at https://localhost:8503 when the startup is completed.
+The application will be available at <https://localhost:8503> when the startup is completed.
