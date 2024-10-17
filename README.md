@@ -6,8 +6,9 @@ the health landscape. In the end, all health data should have corresponding meta
 metadata registers. The Metadata Register endpoints should be described in the Addressing Register.
 The LMR should contain entries for all the metadata in the Metadata Register.
 
-At this moment, the LMR only supports FHIR ImaginStudy as part of PoC. Further resources
-will be added to the application in consultation with other parties in the field
+At this moment, the LMR only supports [FHIR ImaginStudy](https://hl7.org/fhir/R4/imagingstudy.html)
+as part of a PoC. Further resources will be added to the application in consultation
+with other parties in the field
 
 ## Disclaimer
 
