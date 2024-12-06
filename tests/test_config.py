@@ -1,5 +1,14 @@
-from app.config import Config, ConfigApp, ConfigNVIAPI, LogLevel, ConfigDatabase, ConfigUvicorn, ConfigTelemetry, ConfigStats, \
-    ConfigPseudonymApi
+from app.config import (
+    Config,
+    ConfigApp,
+    ConfigDatabase,
+    ConfigNVIAPI,
+    ConfigPseudonymApi,
+    ConfigStats,
+    ConfigTelemetry,
+    ConfigUvicorn,
+    LogLevel,
+)
 
 
 def get_test_config() -> Config:
@@ -45,10 +54,5 @@ def get_test_config() -> Config:
             service_name=None,
             tracer_name=None,
         ),
-        stats=ConfigStats(
-            enabled=False,
-            host=None,
-            port=None,
-            module_name=None
-        )
+        stats=ConfigStats(enabled=False, host=None, port=None, module_name=None),
     )

@@ -1,10 +1,10 @@
 import logging
 import uuid
-from typing import Any, Dict, Annotated
+from typing import Annotated, Any, Dict
 
-from fastapi import APIRouter, HTTPException, Depends, Body, Query, Header
-from fhir.resources.bundle import BundleEntry, Bundle
-from fhir.resources.fhirtypes import Code, UnsignedInt, Id
+from fastapi import APIRouter, Body, Depends, Header, HTTPException, Query
+from fhir.resources.bundle import Bundle, BundleEntry
+from fhir.resources.fhirtypes import Code, Id, UnsignedInt
 from opentelemetry import trace
 from starlette.responses import Response
 
@@ -23,15 +23,16 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/resource/{resource_type}/_search",
-            summary="Find all resources for given type for the pseudonym",
-            tags=["metadata"]
-            )
+@router.get(
+    "/resource/{resource_type}/_search",
+    summary="Find all resources for given type for the pseudonym",
+    tags=["metadata"],
+)
 def search_resource(
-        pseudonym: str,
-        resource_type: str,
-        service: MetadataService = Depends(container.get_metadata_service),
-        pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service)
+    pseudonym: str,
+    resource_type: str,
+    service: MetadataService = Depends(container.get_metadata_service),
+    pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service),
 ) -> Any:
     span = trace.get_current_span()
     span.update_name(f"GET /resource/{resource_type}/_search?pseudonym={pseudonym}")
@@ -48,35 +49,37 @@ def search_resource(
         id=Id(uuid.uuid4()),
         type=Code("searchset"),
         total=UnsignedInt(len(entry)),
-        entry=[BundleEntry(resource=res.resource) for res in entry]  # type: ignore
+        entry=[BundleEntry(resource=res.resource) for res in entry],  # type: ignore
     )
 
     return bundle.dict()
 
 
-@router.get("/resource/{resource_type}/{resource_id}/_history/{vid}",
-            summary="Find a specific version of the resource in the metadata",
-            tags=["metadata"]
-            )
+@router.get(
+    "/resource/{resource_type}/{resource_id}/_history/{vid}",
+    summary="Find a specific version of the resource in the metadata",
+    tags=["metadata"],
+)
 def get_resource_history(
-        resource_type: str,
-        resource_id: str,
-        vid: int,
-        _pretty: bool = False,
-        service: MetadataService = Depends(container.get_metadata_service)
+    resource_type: str,
+    resource_id: str,
+    vid: int,
+    _pretty: bool = False,
+    service: MetadataService = Depends(container.get_metadata_service),
 ) -> Any:
     return get_resource_by_version(resource_type, resource_id, vid, service, _pretty)
 
 
-@router.get("/resource/{resource_type}/{resource_id}",
-            summary="Find a specific type/id combination in the metadata",
-            tags=["metadata"]
-            )
+@router.get(
+    "/resource/{resource_type}/{resource_id}",
+    summary="Find a specific type/id combination in the metadata",
+    tags=["metadata"],
+)
 def get_resource(
-        resource_type: str,
-        resource_id: str,
-        _pretty: bool = False,
-        service: MetadataService = Depends(container.get_metadata_service)
+    resource_type: str,
+    resource_id: str,
+    _pretty: bool = False,
+    service: MetadataService = Depends(container.get_metadata_service),
 ) -> Any:
     span = trace.get_current_span()
     span.update_name(f"GET /resource/{resource_type}/{resource_id}")
@@ -86,44 +89,54 @@ def get_resource(
     return get_resource_by_version(resource_type, resource_id, 0, service, _pretty)
 
 
-@router.put("/resource/{resource_type}/{resource_id}",
-            summary="Creates or updates a specific type/id combination in the metadata",
-            tags=["metadata"]
-            )
+@router.put(
+    "/resource/{resource_type}/{resource_id}",
+    summary="Creates or updates a specific type/id combination in the metadata",
+    tags=["metadata"],
+)
 def put_resource(
-        resource_type: str,
-        resource_id: str,
-        pseudonym: str = Query(required=False, default=None, description="Pseudonym to use for the resource"),
-        data: Dict[str, Any] = Body(...),
-        service: MetadataService = Depends(container.get_metadata_service),
-        pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service),
-        nvi_api_service: NVIAPIServiceInterface = Depends(container.get_nvi_service),
-        if_match: Annotated[str | None, Header()] = None
+    resource_type: str,
+    resource_id: str,
+    pseudonym: str = Query(
+        required=False, default=None, description="Pseudonym to use for the resource"
+    ),
+    data: Dict[str, Any] = Body(...),
+    service: MetadataService = Depends(container.get_metadata_service),
+    pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service),
+    nvi_api_service: NVIAPIServiceInterface = Depends(container.get_nvi_service),
+    if_match: Annotated[str | None, Header()] = None,
 ) -> Any:
-
     span = trace.get_current_span()
     span.set_attribute("data.resource_type", resource_type)
     span.set_attribute("data.resource_id", resource_id)
     span.set_attribute("data.pseudonym", pseudonym)
 
     application_pseudonym = None
-    
+
     # Previously, the ura_number was called 'provider_id'
     # https://github.com/minvws/gfmodules-national-referral-index/commit/ae71b98a4e95d176047206a4c10b8ab6d98763ad
     ura_number = get_config().app.provider_id
-    
+
     if pseudonym is not None:
         try:
             typed_pseudonym = Pseudonym(pseudonym)
-            application_pseudonym = pseudonym_service.exchange(typed_pseudonym, ura_number)
+            application_pseudonym = pseudonym_service.exchange(
+                typed_pseudonym, ura_number
+            )
         except ValueError:
             raise HTTPException(status_code=400, detail="Badly formed pseudonym")
 
     try:
         resource = service.search(resource_type, resource_id, 0)
-        if resource is not None and if_match is not None and resource.version != int(if_match):
+        if (
+            resource is not None
+            and if_match is not None
+            and resource.version != int(if_match)
+        ):
             logger.error("If-match header mismatch with resource version")
-            raise HTTPException(status_code=412, detail="Precondition Failed: Version mismatch")
+            raise HTTPException(
+                status_code=412, detail="Precondition Failed: Version mismatch"
+            )
     except InvalidResourceError as e:
         logger.error(f"Invalid resource: {e}")
         raise HTTPException(status_code=400, detail=str(e))
@@ -133,16 +146,14 @@ def put_resource(
 
     try:
         entry = service.update(resource_type, resource_id, data, application_pseudonym)
-        
-        
+
         if application_pseudonym is not None:
             referral = CreateReferralRequestBody(
                 pseudonym=typed_pseudonym,
                 data_domain=DataDomain.BeeldBank,
                 ura_number=UraNumber(ura_number),
-                
                 # If defined how authentication should work, define the uzi number here
-                requesting_uzi_number="00000000"
+                requesting_uzi_number="00000000",
             )
             nvi_api_service.create_referral(referral)
     except InvalidResourceError as e:
@@ -167,18 +178,19 @@ def put_resource(
             "ETag": str(entry.version),
             "Last-Modified": entry.created_dt.isoformat(),
             "Location": f"/resource/{resource_type}/{resource_id}/_history/{entry.version}",
-        }
+        },
     )
 
 
-@router.delete("/resource/{resource_type}/{resource_id}",
-               summary="Removes a given type/id combination from the metadata",
-               tags=["metadata"]
-               )
+@router.delete(
+    "/resource/{resource_type}/{resource_id}",
+    summary="Removes a given type/id combination from the metadata",
+    tags=["metadata"],
+)
 def delete_resource(
-        resource_type: str,
-        resource_id: str,
-        service: MetadataService = Depends(container.get_metadata_service)
+    resource_type: str,
+    resource_id: str,
+    service: MetadataService = Depends(container.get_metadata_service),
 ) -> Any:
     span = trace.get_current_span()
     span.set_attribute("data.resource_type", resource_type)
@@ -193,13 +205,14 @@ def delete_resource(
     return Response(status_code=204)
 
 
-@router.patch("/resource/{resource_type}/{resource_id}",
-              summary="Patches a specific type/id combination in the metadata",
-              tags=["metadata"]
-              )
+@router.patch(
+    "/resource/{resource_type}/{resource_id}",
+    summary="Patches a specific type/id combination in the metadata",
+    tags=["metadata"],
+)
 def patch_resource(
-        resource_type: str,
-        resource_id: str,
+    resource_type: str,
+    resource_id: str,
 ) -> Response:
     span = trace.get_current_span()
     span.set_attribute("data.resource_type", resource_type)
@@ -209,8 +222,13 @@ def patch_resource(
     return Response(status_code=405)
 
 
-def get_resource_by_version(resource_type: str, resource_id: str, vid: int, service: MetadataService,
-                            pretty: bool = False) -> Response:
+def get_resource_by_version(
+    resource_type: str,
+    resource_id: str,
+    vid: int,
+    service: MetadataService,
+    pretty: bool = False,
+) -> Response:
     """
     Get a resource from the metadata service based on the id and version. If vid == 0, it will fetch the
     latest version
@@ -237,5 +255,5 @@ def get_resource_by_version(resource_type: str, resource_id: str, vid: int, serv
         headers={
             "ETag": str(resource.version),
             "Last-Modified": resource.created_dt.isoformat(),
-        }
+        },
     )

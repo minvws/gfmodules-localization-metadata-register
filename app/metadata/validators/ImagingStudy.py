@@ -8,7 +8,6 @@ from app.metadata.validators.Validator import Validator
 
 
 class ImagingStudyValidator(Validator):
-
     def validate(self, obj: Resource) -> None:
         if not isinstance(obj, ImagingStudy):
             raise Exception("Resource is not an ImagingStudy")
@@ -32,9 +31,9 @@ class ImagingStudyValidator(Validator):
             org_found = False
             physician_found = False
             for performer in series_entry.performer:
-                if performer.actor.type == 'Organization':
+                if performer.actor.type == "Organization":
                     org_found = True
-                if performer.actor.type == 'Practitioner':
+                if performer.actor.type == "Practitioner":
                     physician_found = True
 
             if not org_found:

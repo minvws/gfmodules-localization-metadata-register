@@ -1,11 +1,11 @@
 import logging
 
-from sqlalchemy import create_engine, text, StaticPool
+from sqlalchemy import StaticPool, create_engine, text
 from sqlalchemy.orm import Session
 
 from app.config import get_config
-from app.db.session import DbSession
 from app.db.models import Base
+from app.db.session import DbSession
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +16,10 @@ class Database:
             if "sqlite://" in dsn:
                 self.engine = create_engine(
                     dsn,
-                    connect_args={'check_same_thread': False},      # This + static pool is needed for sqlite in-memory tables
-                    poolclass=StaticPool
+                    connect_args={
+                        "check_same_thread": False
+                    },  # This + static pool is needed for sqlite in-memory tables
+                    poolclass=StaticPool,
                 )
             else:
                 config = get_config()
@@ -27,7 +29,7 @@ class Database:
                     pool_pre_ping=config.database.pool_pre_ping,
                     pool_recycle=config.database.pool_recycle,
                     pool_size=config.database.pool_size,
-                    max_overflow=config.database.max_overflow
+                    max_overflow=config.database.max_overflow,
                 )
 
         except BaseException as e:
@@ -49,7 +51,7 @@ class Database:
         """
         try:
             with Session(self.engine) as session:
-                session.execute(text('SELECT 1'))
+                session.execute(text("SELECT 1"))
             return True
         except Exception as e:
             logger.info("Database is not healthy: %s", e)

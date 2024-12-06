@@ -1,6 +1,6 @@
 import argparse
 import logging
-from typing import Protocol, Any
+from typing import Any, Protocol
 
 import inject
 
@@ -10,22 +10,21 @@ logger = logging.getLogger(__name__)
 
 
 class CronCommand(Protocol):
-    def init_arguments(self, subparser: Any) -> None:
-        ...
+    def init_arguments(self, subparser: Any) -> None: ...
 
-    def run(self, args: argparse.Namespace) -> int:
-        ...
+    def run(self, args: argparse.Namespace) -> int: ...
 
 
-CRON_COMMANDS: dict[str, CronCommand] = {
-}
+CRON_COMMANDS: dict[str, CronCommand] = {}
 
 
 def main() -> None:
     application.application_init()
 
     parser = argparse.ArgumentParser(description="Cron command line interface")
-    subparser = parser.add_subparsers(dest="command", title="cron commands", help="valid cron commands", required=True)
+    subparser = parser.add_subparsers(
+        dest="command", title="cron commands", help="valid cron commands", required=True
+    )
     for name in CRON_COMMANDS.keys():
         command_get(name).init_arguments(subparser)
 

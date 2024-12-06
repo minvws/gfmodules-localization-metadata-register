@@ -1,7 +1,7 @@
-from typing import Type, Dict, Any
+from typing import Any, Dict, Type
 
-from app.db.repository import RepositoryBase
 from app.db.models import Base
+from app.db.repository import RepositoryBase
 
 repository_registry: Dict[Type[Base], Type[RepositoryBase]] = {}
 
@@ -19,4 +19,5 @@ def repository(model_class: Type[Base]) -> Any:
 
         repository_registry[model_class] = repo_class
         return repo_class
+
     return decorator
