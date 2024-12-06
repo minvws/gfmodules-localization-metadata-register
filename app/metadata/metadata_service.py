@@ -4,6 +4,8 @@ from app.data import Pseudonym
 from app.db.models import ResourceEntry
 from app.metadata.fhir import convert_resource_to_fhir
 from app.metadata.validators.ImagingStudy import ImagingStudyValidator
+from app.metadata.validators.medication import MedicationValidator
+from app.metadata.validators.medication_statement import MedicationStatementValidator
 from app.metadata.validators.Patient import PatientValidator
 from app.metadata.validators.Validator import (
     InvalidResourceError,
@@ -29,12 +31,15 @@ class MetadataAdapter(Protocol):
 
 
 def create_validator(resource_type: str) -> Validator | None:
-    if resource_type == "ImagingStudy":
-        return ImagingStudyValidator()
-    elif resource_type == "Patient":
-        return PatientValidator()
-
-    return None
+    match resource_type:
+        case "ImagingStudy":
+            return ImagingStudyValidator()
+        case "Patient":
+            return PatientValidator()
+        case "Medication":
+            return MedicationValidator()
+        case _:
+            return None
 
 
 def validate_resource(resource_type: str, resource_id: str, data: dict[str, Any]) -> None:

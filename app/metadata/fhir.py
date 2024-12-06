@@ -14,6 +14,7 @@ ALLOWED_RESOURCES = [
     "Observation",
     "Practitioner",
     "Organization",
+    "Medication",
 ]
 
 
