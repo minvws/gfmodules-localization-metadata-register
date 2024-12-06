@@ -13,17 +13,12 @@ from fhir.resources.R4B.coding import Coding
 from fhir.resources.R4B.fhirtypes import ImagingStudySeriesType
 from fhir.resources.R4B.humanname import HumanName
 from fhir.resources.R4B.identifier import Identifier
-from fhir.resources.R4B.imagingstudy import (
-    ImagingStudy,
-    ImagingStudySeries,
-    ImagingStudySeriesInstance,
-)
+from fhir.resources.R4B.imagingstudy import ImagingStudy, ImagingStudySeriesInstance
 from fhir.resources.R4B.organization import Organization
 from fhir.resources.R4B.patient import Patient
 from fhir.resources.R4B.practitioner import Practitioner
 from fhir.resources.R4B.reference import Reference
 from fhir.resources.R4B.resource import Resource
-from requests.auth import HTTPBasicAuth
 
 from app.config import get_config
 from app.data import Pseudonym

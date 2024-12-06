@@ -49,7 +49,7 @@ def convert_resource_to_fhir(data: Dict[str, Any]) -> Resource | None:
         return None
 
     try:
-        module = importlib.import_module("fhir.resources.R4B." + resource_type.lower())
+        module = importlib.import_module(f"fhir.resources.R4B.{resource_type.lower()}")
         resource_class = getattr(module, resource_type, None)
         if resource_class:
             try:

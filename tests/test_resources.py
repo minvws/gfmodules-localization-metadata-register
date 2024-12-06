@@ -3,12 +3,12 @@ import uuid
 from typing import Any
 
 from fastapi.testclient import TestClient
-from fhir.resources.fhirtypes import Code, Date, HumanNameType, Id, IdentifierType
-from fhir.resources.patient import Patient
-from test_config import get_test_config
+from fhir.resources.R4B.fhirtypes import Code, Date, HumanNameType, Id, IdentifierType
+from fhir.resources.R4B.patient import Patient
 
 from app.application import create_fastapi_app
 from app.config import set_config
+from tests.test_config import get_test_config
 
 set_config(get_test_config())
 app = create_fastapi_app()
