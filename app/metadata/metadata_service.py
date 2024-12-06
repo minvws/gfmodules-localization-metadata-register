@@ -38,6 +38,8 @@ def create_validator(resource_type: str) -> Validator | None:
             return PatientValidator()
         case "Medication":
             return MedicationValidator()
+        case "MedicationStatement":
+            return MedicationStatementValidator()
         case _:
             return None
 

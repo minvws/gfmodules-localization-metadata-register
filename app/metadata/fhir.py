@@ -15,6 +15,7 @@ ALLOWED_RESOURCES = [
     "Practitioner",
     "Organization",
     "Medication",
+    "MedicationStatement",
 ]
 
 
