@@ -30,16 +30,16 @@ lint-fix: ## Fix linting errors
 	$(RUN_PREFIX) ruff format
 
 type-check: ## Check for typing errors
-	$(RUN_PREFIX) mypy
+	$(RUN_PREFIX) mypy app
 
 safety-check: ## Check for security vulnerabilities
 	$(RUN_PREFIX) safety check
 
 spelling-check: ## Check spelling mistakes
-	$(RUN_PREFIX) codespell .
+	$(RUN_PREFIX) codespell . --skip="./mocks" --ignore-words=codespell-ignore.txt
 
 spelling-fix: ## Fix spelling mistakes
-	$(RUN_PREFIX) codespell . --write-changes --interactive=3
+	$(RUN_PREFIX) codespell . --write-changes --interactive=3 --skip="./mocks" --ignore-words=codespell-ignore.txt
 
 test: ## Runs automated tests
 	$(RUN_PREFIX) pytest --cov --cov-report=term --cov-report=xml
