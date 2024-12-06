@@ -8,7 +8,7 @@ ORGANIZATION_TYPES: Final[tuple[str, ...]] = ("Hospital", "Clinic", "Pharmacy", 
 COMPONENT: Final[str] = "org"
 
 
-def generate_organization(name: str) -> Organization:
+def generate_organization(name: str, typ: str | None = None) -> Organization:
     uuid = fake.uuid4()
 
     return Organization.construct(

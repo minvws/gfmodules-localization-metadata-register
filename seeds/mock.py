@@ -1,29 +1,8 @@
-from functools import partial
 from app.data import Pseudonym
-from seeds.medication import generate_medication
-from seeds.medication_statement import generate_medication_statement
-from seeds.organization import generate_organization
-from seeds.patient import generate_patient
-from seeds.utils import mocks_path, write_and_store
-
-
-def mock_medication_statemnt(pseudonym: Pseudonym) -> None:
-    _write_and_store = partial(
-        write_and_store, dir=mocks_path(pseudonym), pseudonym=pseudonym
-    )
-    organization = generate_organization("Ziekthuis")
-    _write_and_store(resource=organization)
-    medication = generate_medication(organization)
-    _write_and_store(resource=medication)
-    patient = generate_patient()
-    print(patient)
-    _write_and_store(resource=patient)
-    _write_and_store(resource=generate_medication_statement(medication, patient))
-
-
-def mock_imaging(pseudonym: Pseudonym) -> None:
-    pass
+from seeds.image_study import mock_image_study
+from seeds.medication_statement import mock_medication_statemnt
 
 
 if __name__ == "__main__":
+    mock_image_study(Pseudonym("bbf54282-3d58-4bed-b27b-dd4e1b85ec08"))
     mock_medication_statemnt(Pseudonym("c67230ce-0a28-4e06-9fe9-6ca218f92923"))

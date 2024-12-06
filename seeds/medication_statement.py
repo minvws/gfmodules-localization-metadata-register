@@ -1,17 +1,25 @@
+from functools import partial
 from uuid import UUID
+
 from fhir.resources.R4B.codeableconcept import CodeableConcept
 from fhir.resources.R4B.dosage import Dosage
 from fhir.resources.R4B.medication import Medication
+from fhir.resources.R4B.medicationstatement import MedicationStatement
 from fhir.resources.R4B.patient import Patient
 from typing_extensions import Final
+
+from app.data import Pseudonym
+from seeds.medication import generate_medication
+from seeds.organization import generate_organization
+from seeds.person import generate_patient
 from seeds.utils import (
     fake,
     generate_coding,
     generate_identifier,
     generate_period,
     generate_reference,
+    write_and_store,
 )
-from fhir.resources.R4B.medicationstatement import MedicationStatement
 
 STATUS: Final[tuple[str, ...]] = ("active", "inactive", "entered-in-error")
 
@@ -47,3 +55,11 @@ def generate_medication_statement(
         ],
         dosage=generate_dosage(),
     )
+
+
+def mock_medication_statemnt(pseudonym: Pseudonym) -> None:
+    _write_and_store = partial(write_and_store, pseudonym=pseudonym)
+    organization = _write_and_store(resource=generate_organization("Ziekthuis"))
+    medication = _write_and_store(resource=generate_medication(organization))
+    patient = _write_and_store(resource=generate_patient())
+    _write_and_store(resource=generate_medication_statement(medication, patient))

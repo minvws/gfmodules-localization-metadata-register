@@ -5,7 +5,7 @@ from fhir.resources.R4B.coding import Coding
 from fhir.resources.R4B.fhirtypes import PeriodType
 from fhir.resources.R4B.identifier import Identifier
 from fhir.resources.R4B.reference import Reference
-from typing_extensions import Any, Final, override
+from typing_extensions import Any, Final, TypeVar, override
 from uuid import UUID
 from faker import Faker
 from pathlib import Path
@@ -28,6 +28,7 @@ METADATA_SERVICE: Final[MetadataService] = MetadataService(
     )
 )
 URI_EXAMPLE: Final[str] = "https://example.org"
+T = TypeVar("T", bound=Resource)
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -69,18 +70,22 @@ def write_component(filepath: Path, data: dict[str, Any]) -> None:
     filepath.write_text(data=json_dumps(data), encoding="utf-8")
 
 
-def write_and_store(dir: Path, resource: Resource, pseudonym: Pseudonym) -> None:
+def write_and_store(resource: T, pseudonym: Pseudonym, dir: Path | None = None) -> T:
+    if not dir:
+        dir = mocks_path(pseudonym)
     write_component(
         component_filepath(dir, resource.resource_type.lower(), UUID(resource.id)),
         resource.dict(),
     )
     store(resource, pseudonym)
+    return resource
 
 
 def generate_reference(component: str, id: UUID, name: str | None = None) -> Reference:
     return Reference.construct(
         reference=f"{component.capitalize()}/{id}",
         display=name if name else fake.company(),
+        type=component.capitalize(),
     )
 
 
