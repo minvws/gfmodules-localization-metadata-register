@@ -1,8 +1,10 @@
 from collections.abc import Sequence
 from datetime import date, datetime, timedelta
 import random
+from typing import TypedDict
 from fhir.resources.R4B.coding import Coding
 from fhir.resources.R4B.fhirtypes import PeriodType
+from fhir.resources.R4B.humanname import HumanName
 from fhir.resources.R4B.identifier import Identifier
 from fhir.resources.R4B.reference import Reference
 from typing_extensions import Any, Final, TypeVar, override
@@ -23,9 +25,7 @@ config = get_config()
 
 
 METADATA_SERVICE: Final[MetadataService] = MetadataService(
-    DbMetadataAdapter(
-        Database(dsn=config.database.dsn, create_tables=config.database.create_tables)
-    )
+    DbMetadataAdapter(Database(dsn=config.database.dsn, create_tables=config.database.create_tables))
 )
 URI_EXAMPLE: Final[str] = "https://example.org"
 T = TypeVar("T", bound=Resource)
@@ -43,7 +43,7 @@ def json_dumps(data: dict[str, Any]) -> str:
     return json.dumps(data, indent=4, cls=CustomJSONEncoder)
 
 
-def store(resource: Resource, pseudonym: Pseudonym):
+def store(resource: Resource, pseudonym: Pseudonym) -> None:
     if (
         METADATA_SERVICE.update(
             resource.resource_type,
@@ -81,11 +81,11 @@ def write_and_store(resource: T, pseudonym: Pseudonym, dir: Path | None = None) 
     return resource
 
 
-def generate_reference(component: str, id: UUID, name: str | None = None) -> Reference:
+def generate_reference(resource: T, name: str | None = None) -> Reference:
     return Reference.construct(
-        reference=f"{component.capitalize()}/{id}",
-        display=name if name else fake.company(),
-        type=component.capitalize(),
+        reference=resource.relative_path(),
+        display=name or fake.word(),
+        type=resource.resource_type.capitalize(),
     )
 
 
@@ -97,17 +97,11 @@ def generate_coding(route: str, display_strings: Sequence[str] | None = None) ->
     return Coding.construct(
         system=f"{URI_EXAMPLE}/{route}",
         code=random.randint(100000, 999999),
-        display=(
-            fake.random_element(elements=display_strings)
-            if display_strings
-            else fake.word().capitalize()
-        ),
+        display=(fake.random_element(elements=display_strings) if display_strings else fake.word().capitalize()),
     )
 
 
-def _generate_period(
-    start: date | None = None, end: date | None = None
-) -> dict[str, date]:
+def _generate_period(start: date | None = None, end: date | None = None) -> dict[str, date]:
     time_range = timedelta(weeks=15)
 
     def generate(start: date, end: date) -> dict[str, date]:
@@ -129,3 +123,16 @@ def _generate_period(
 
 def generate_period(start: date | None = None, end: date | None = None) -> PeriodType:
     return PeriodType(**_generate_period(start, end))
+
+
+class Identification(TypedDict):
+    id: UUID
+    identifier: list[Identifier]
+
+
+def generate_identification(component: str) -> Identification:
+    return Identification(id=(id := fake.uuid4()), identifier=[generate_identifier(component, id)])
+
+
+def displayname(name: HumanName):
+    return f"{name.given[0]} {name.family}"

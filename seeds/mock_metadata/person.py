@@ -1,11 +1,22 @@
 from collections.abc import Callable
 import random
+from typing_extensions import Final
 from fhir.resources.R4B.address import Address
 from fhir.resources.R4B.humanname import HumanName
 from fhir.resources.R4B.patient import Patient
 from fhir.resources.R4B.practitioner import Practitioner
 
-from seeds.utils import fake, generate_identifier
+from app.data import Pseudonym
+from seeds.mock_metadata.utils import fake, generate_identification, write_and_store
+
+PRACTICIONS: Final[tuple[tuple[str, str], ...]] = (
+    ("Dokter", "Bibber"),
+    ("Zuster", "Bloedwijn"),
+    ("Oogarts", "Appel"),
+    ("Radioloog", "Straal"),
+)
+
+N_PATIENTS = 2
 
 
 def generate_first_names(gender_faker: Callable[[], str]) -> list[str]:
@@ -39,7 +50,6 @@ def generate_address(use: str) -> Address:
 
 
 def generate_patient():
-    uuid = fake.uuid4()
     gender = fake.random_element(
         elements=(
             ("male", fake.first_name_male),
@@ -50,8 +60,7 @@ def generate_patient():
     )
 
     return Patient.construct(
-        id=uuid,
-        identifier=[generate_identifier("patient", uuid)],
+        **generate_identification("patient"),
         active=True,
         address=[generate_address("home")],
         birth_date=fake.date_of_birth(),
@@ -62,12 +71,18 @@ def generate_patient():
 
 
 def generate_practitioner(family: str, given: str):
-    uuid = fake.uuid4()
     return Practitioner.construct(
-        id=uuid,
-        identifier=[generate_identifier("practitioner", uuid)],
+        **generate_identification("practitioner"),
         active=True,
         address=[generate_address("work")],
         birth_date=fake.date_of_birth(),
         name=[HumanName.construct(family=family, given=[given])],
     )
+
+
+def mock_practitioners(pseudonym: Pseudonym):
+    return [write_and_store(generate_practitioner(*name), pseudonym) for name in PRACTICIONS]
+
+
+def mock_patients(pseudonym: Pseudonym):
+    return write_and_store(generate_patient(), pseudonym)

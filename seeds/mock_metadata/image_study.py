@@ -1,8 +1,6 @@
-from functools import partial
+from collections.abc import Sequence
 from typing import Final
-from uuid import UUID
 
-from fhir.resources.R4B.humanname import HumanName
 from fhir.resources.R4B.imagingstudy import (
     ImagingStudy,
     ImagingStudySeries,
@@ -13,12 +11,11 @@ from fhir.resources.R4B.patient import Patient
 from fhir.resources.R4B.practitioner import Practitioner
 
 from app.data import Pseudonym
-from seeds.organization import generate_organization
-from seeds.person import generate_patient, generate_practitioner
-from seeds.utils import (
+from seeds.mock_metadata.utils import (
+    displayname,
     fake,
     generate_coding,
-    generate_identifier,
+    generate_identification,
     generate_reference,
     write_and_store,
 )
@@ -46,21 +43,9 @@ ORGANIZATION_NAMES: Final[tuple[str, ...]] = (
     "Huisartsenpost Bloedspoed",
     "Ziekthuis",
 )
-PRACTICIONS: Final[tuple[tuple[str, str], ...]] = (
-    ("Dokter", "Bibber"),
-    ("Zuster", "Bloedwijn"),
-    ("Oogarts", "Appel"),
-    ("Radioloog", "Straal"),
-)
 
 
-def _displayname(name: HumanName):
-    return f"{name.given[0]} {name.family}"
-
-
-def _imaging_study_series(
-    practitioner: Practitioner, organization: Organization, idx: int
-) -> ImagingStudySeries:
+def _imaging_study_series(practitioner: Practitioner, organization: Organization, idx: int) -> ImagingStudySeries:
     return ImagingStudySeries.construct(
         uid=fake.uuid4(),
         number=idx,
@@ -68,17 +53,9 @@ def _imaging_study_series(
         modality=generate_coding("modality", IMAGING_CODES),
         performer=[
             {
-                "actor": generate_reference(
-                    "Practitioner",
-                    UUID(practitioner.id),
-                    _displayname(practitioner.name[0]),
-                ),
+                "actor": generate_reference(practitioner, displayname(practitioner.name[0])),
             },
-            {
-                "actor": generate_reference(
-                    "Organization", UUID(organization.id), organization.name
-                )
-            },
+            {"actor": generate_reference(organization, organization.name or fake.company())},
         ],
         body_site=generate_coding("body-site", BODY_PARTS),
         instance=[
@@ -95,17 +72,13 @@ def _imaging_study_series(
 def generate_imagestudy(
     patient: Patient,
     organization: Organization,
-    practitioners: list[Practitioner],
+    practitioners: Sequence[Practitioner],
 ):
-    uuid = fake.uuid4()
     series_count = fake.random_number(digits=1) + 1
 
     return ImagingStudy.construct(
-        id=uuid,
-        identifier=[generate_identifier("study", uuid)],
-        subject=generate_reference(
-            "Patient", UUID(patient.id), _displayname(patient.name[0])
-        ),
+        **generate_identification("study"),
+        subject=generate_reference(patient, displayname(patient.name[0])),
         status=fake.random_element(elements=STATUS),
         started=fake.date_time_this_decade(),
         numberOfSeries=series_count,
@@ -120,24 +93,18 @@ def generate_imagestudy(
     )
 
 
-def mock_image_study(pseudonym: Pseudonym):
-    _write_and_store = partial(write_and_store, pseudonym=pseudonym)
-
-    organizations = [
-        _write_and_store(resource=generate_organization(name))
-        for name in ORGANIZATION_NAMES
-    ]
-
-    # Generate 10 practitioners
-    practitioners = [
-        _write_and_store(resource=generate_practitioner(*name)) for name in PRACTICIONS
-    ]
-
+def mock_image_study(
+    pseudonym: Pseudonym,
+    organizations: Sequence[Organization],
+    practitioners: Sequence[Practitioner],
+    patient: Patient,
+):
     for _ in range(fake.random_number(digits=1) + 2):
-        _write_and_store(
-            resource=generate_imagestudy(
-                _write_and_store(resource=generate_patient()),
+        write_and_store(
+            generate_imagestudy(
+                patient,
                 fake.random_element(elements=organizations),
                 practitioners,
-            )
+            ),
+            pseudonym,
         )
