@@ -17,9 +17,7 @@ def setup_telemetry(app: fastapi.FastAPI) -> None:
     config = get_config()
     processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=config.telemetry.endpoint))
 
-    resource = Resource(
-        attributes={"service.name": config.telemetry.service_name or ""}
-    )
+    resource = Resource(attributes={"service.name": config.telemetry.service_name or ""})
     provider = TracerProvider(resource=resource)
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)

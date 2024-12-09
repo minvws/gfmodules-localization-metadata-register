@@ -21,16 +21,10 @@ class TestApi(unittest.TestCase):
         assert mw.normalize_path(req) == "/resource/patient/%resource_id%"
 
         req = self.create_req("/resource/patient/1234/_history/5678")
-        assert (
-            mw.normalize_path(req)
-            == "/resource/patient/%resource_id%/_history/%version_id%"
-        )
+        assert mw.normalize_path(req) == "/resource/patient/%resource_id%/_history/%version_id%"
 
         req = self.create_req("/resource/foobar/1234/_history/5678")
-        assert (
-            mw.normalize_path(req)
-            == "/resource/foobar/%resource_id%/_history/%version_id%"
-        )
+        assert mw.normalize_path(req) == "/resource/foobar/%resource_id%/_history/%version_id%"
 
     def create_req(self, path: str) -> Request:
         return Request(

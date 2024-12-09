@@ -97,9 +97,7 @@ def get_resource(
 def put_resource(
     resource_type: str,
     resource_id: str,
-    pseudonym: str = Query(
-        required=False, default=None, description="Pseudonym to use for the resource"
-    ),
+    pseudonym: str = Query(required=False, default=None, description="Pseudonym to use for the resource"),
     data: Dict[str, Any] = Body(...),
     service: MetadataService = Depends(container.get_metadata_service),
     pseudonym_service: PseudonymService = Depends(container.get_pseudonym_service),
@@ -120,23 +118,15 @@ def put_resource(
     if pseudonym is not None:
         try:
             typed_pseudonym = Pseudonym(pseudonym)
-            application_pseudonym = pseudonym_service.exchange(
-                typed_pseudonym, ura_number
-            )
+            application_pseudonym = pseudonym_service.exchange(typed_pseudonym, ura_number)
         except ValueError:
             raise HTTPException(status_code=400, detail="Badly formed pseudonym")
 
     try:
         resource = service.search(resource_type, resource_id, 0)
-        if (
-            resource is not None
-            and if_match is not None
-            and resource.version != int(if_match)
-        ):
+        if resource is not None and if_match is not None and resource.version != int(if_match):
             logger.error("If-match header mismatch with resource version")
-            raise HTTPException(
-                status_code=412, detail="Precondition Failed: Version mismatch"
-            )
+            raise HTTPException(status_code=412, detail="Precondition Failed: Version mismatch")
     except InvalidResourceError as e:
         logger.error(f"Invalid resource: {e}")
         raise HTTPException(status_code=400, detail=str(e))

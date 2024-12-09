@@ -85,9 +85,7 @@ class StatsdMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.module_name = module_name
 
-    async def dispatch(
-        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         normalized_path = self.normalize_path(request)
 
         key = f"{self.module_name}.http.request.{request.method.lower()}.{normalized_path}"

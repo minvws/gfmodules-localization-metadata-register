@@ -36,12 +36,8 @@ def get_uvicorn_params() -> dict[str, Any]:
         and config.uvicorn.ssl_cert_file is not None
         and config.uvicorn.ssl_key_file is not None
     ):
-        kwargs["ssl_keyfile"] = (
-            f"{config.uvicorn.ssl_base_dir}/{config.uvicorn.ssl_key_file}"
-        )
-        kwargs["ssl_certfile"] = (
-            f"{config.uvicorn.ssl_base_dir}/{config.uvicorn.ssl_cert_file}"
-        )
+        kwargs["ssl_keyfile"] = f"{config.uvicorn.ssl_base_dir}/{config.uvicorn.ssl_key_file}"
+        kwargs["ssl_certfile"] = f"{config.uvicorn.ssl_base_dir}/{config.uvicorn.ssl_cert_file}"
     return kwargs
 
 
@@ -103,9 +99,7 @@ def setup_fastapi() -> FastAPI:
         fastapi.include_router(router)
 
     if get_config().stats.enabled:
-        fastapi.add_middleware(
-            StatsdMiddleware, module_name=get_config().stats.module_name
-        )
+        fastapi.add_middleware(StatsdMiddleware, module_name=get_config().stats.module_name)
 
     fastapi.add_exception_handler(Exception, default_fhir_exception_handler)
 

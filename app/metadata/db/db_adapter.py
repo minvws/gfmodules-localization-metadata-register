@@ -24,9 +24,7 @@ class DbMetadataAdapter(MetadataAdapter):
     def __init__(self, db: Database):
         self.db = db
 
-    def search_by_pseudonym(
-        self, pseudonym: Pseudonym, resource_type: str
-    ) -> Sequence[ResourceEntry]:
+    def search_by_pseudonym(self, pseudonym: Pseudonym, resource_type: str) -> Sequence[ResourceEntry]:
         """
         Search for metadata for a pseudonym
         """
@@ -37,9 +35,7 @@ class DbMetadataAdapter(MetadataAdapter):
 
             return resource_repository.find_by_pseudonym(pseudonym, resource_type)
 
-    def search(
-        self, resource_type: str, resource_id: str, version: int
-    ) -> ResourceEntry | None:
+    def search(self, resource_type: str, resource_id: str, version: int) -> ResourceEntry | None:
         """
         Search for metadata for a resource
         """
@@ -50,9 +46,7 @@ class DbMetadataAdapter(MetadataAdapter):
             if not resource_repository:
                 return None
 
-            return resource_repository.find_by_resource(
-                resource_type, resource_id, version
-            )
+            return resource_repository.find_by_resource(resource_type, resource_id, version)
 
     def delete(self, resource_type: str, resource_id: str) -> None:
         """
@@ -82,6 +76,4 @@ class DbMetadataAdapter(MetadataAdapter):
             if not resource_repository:
                 return None
 
-            return resource_repository.upsert(
-                resource_type, resource_id, data, pseudonym
-            )
+            return resource_repository.upsert(resource_type, resource_id, data, pseudonym)
