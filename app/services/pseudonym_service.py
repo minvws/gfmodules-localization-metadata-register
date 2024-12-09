@@ -21,7 +21,14 @@ class PseudonymServiceInterface(ABC):
 
 
 class PseudonymService(PseudonymServiceInterface):
-    def __init__(self, endpoint: str, timeout: int, mtls_cert: str|None, mtls_key: str|None, mtls_ca: str|None):
+    def __init__(
+        self,
+        endpoint: str,
+        timeout: int,
+        mtls_cert: str | None,
+        mtls_key: str | None,
+        mtls_ca: str | None,
+    ):
         self.endpoint = endpoint
         self.timeout = timeout
         self.mtls_cert = mtls_cert
@@ -36,11 +43,13 @@ class PseudonymService(PseudonymServiceInterface):
                 f"{self.endpoint}/exchange",
                 json={
                     "source_pseudonym": str(pseudonym),
-                    "target_provider_id": str(provider_id)
+                    "target_provider_id": str(provider_id),
                 },
                 timeout=self.timeout,
-                cert=(self.mtls_cert, self.mtls_key) if self.mtls_cert and self.mtls_key else None,
-                verify=self.mtls_ca if self.mtls_ca else True
+                cert=(self.mtls_cert, self.mtls_key)
+                if self.mtls_cert and self.mtls_key
+                else None,
+                verify=self.mtls_ca if self.mtls_ca else True,
             )
         except (Exception, HTTPError) as e:
             raise PseudonymError(f"Failed to exchange pseudonym: {e}")
@@ -50,7 +59,7 @@ class PseudonymService(PseudonymServiceInterface):
 
         data = req.json()
         try:
-            new_pseudonym = Pseudonym(data.get('pseudonym', ''))
+            new_pseudonym = Pseudonym(data.get("pseudonym", ""))
         except ValueError:
             raise PseudonymError("Failed to exchange pseudonym: invalid pseudonym")
 

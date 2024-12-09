@@ -1,15 +1,15 @@
 import logging
 import random
 from time import sleep
-from typing import Callable, Any, TypeVar, Type
+from typing import Any, Callable, Type, TypeVar
 
 from sqlalchemy import Engine
-from sqlalchemy.exc import OperationalError, DatabaseError, PendingRollbackError
+from sqlalchemy.exc import DatabaseError, OperationalError, PendingRollbackError
 from sqlalchemy.orm import Session
 
 from app.config import get_config
 from app.db.models import Base
-from app.db.repository import TRepositoryBase, RepositoryBase
+from app.db.repository import RepositoryBase, TRepositoryBase
 
 """
 This module contains the DbSession class, which is a context manager that provides a session to interact with
@@ -27,14 +27,14 @@ Usage:
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class DbSession:
     def __init__(self, engine: Engine) -> None:
         self._engine = engine
 
-    def __enter__(self) -> 'DbSession':
+    def __enter__(self) -> "DbSession":
         """
         Create a new session when entering the context manager
         """
@@ -47,7 +47,9 @@ class DbSession:
         """
         self.session.close()
 
-    def get_repository(self, repository_class: Type[TRepositoryBase]) -> TRepositoryBase:
+    def get_repository(
+        self, repository_class: Type[TRepositoryBase]
+    ) -> TRepositoryBase:
         """
         Returns an instantiated repository
         """
@@ -139,7 +141,7 @@ class DbSession:
                 raise Exception("Operation failed after all retries")
 
             logger.info("Retrying operation in %s seconds", backoff[0])
-            sleep(backoff[0] + random.uniform(0, 0.1) )
+            sleep(backoff[0] + random.uniform(0, 0.1))
             backoff = backoff[1:]
 
     def query(self, *entities: Any) -> Any:

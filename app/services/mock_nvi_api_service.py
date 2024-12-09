@@ -5,4 +5,8 @@ from app.services.nvi_api_service import NVIAPIServiceInterface
 
 class MockNVIAPIService(NVIAPIServiceInterface):
     def create_referral(self, body: CreateReferralRequestBody) -> ReferralEntry:
-        return ReferralEntry(str(body.pseudonym), data_domain=body.data_domain, ura_number=body.ura_number)
+        return ReferralEntry(
+            str(body.pseudonym),
+            data_domain=body.data_domain,
+            ura_number=body.ura_number,
+        )
