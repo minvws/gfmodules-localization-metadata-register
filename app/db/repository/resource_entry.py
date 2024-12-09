@@ -12,9 +12,7 @@ from app.db.repository import RepositoryBase
 
 @repository(ResourceEntry)
 class ResourceEntryRepository(RepositoryBase):
-    def find_by_pseudonym(
-        self, pseudonym: Pseudonym, resource_type: str
-    ) -> Sequence[ResourceEntry]:
+    def find_by_pseudonym(self, pseudonym: Pseudonym, resource_type: str) -> Sequence[ResourceEntry]:
         stmt = (
             select(ResourceEntry)
             .where(ResourceEntry.pseudonym == str(pseudonym))
@@ -23,9 +21,7 @@ class ResourceEntryRepository(RepositoryBase):
 
         return self.db_session.execute(stmt).scalars().all()  # type: ignore
 
-    def find_by_resource(
-        self, resource_type: str, resource_id: str, version: int
-    ) -> ResourceEntry | None:
+    def find_by_resource(self, resource_type: str, resource_id: str, version: int) -> ResourceEntry | None:
         stmt = (
             select(ResourceEntry)
             .where(ResourceEntry.resource_type.ilike(resource_type))
@@ -74,11 +70,8 @@ class ResourceEntryRepository(RepositoryBase):
 
             if "postgresql" in self.db_session.get_dialect():
                 subquery = (
-                    self.db_session.query(
-                        func.coalesce(func.max(ResourceEntry.version), 0) + 1
-                    ).filter(
-                        ResourceEntry.resource_id == resource_id
-                        and ResourceEntry.resource_type == resource_type
+                    self.db_session.query(func.coalesce(func.max(ResourceEntry.version), 0) + 1).filter(
+                        ResourceEntry.resource_id == resource_id and ResourceEntry.resource_type == resource_type
                     )
                 ).scalar_subquery()
 
@@ -96,9 +89,7 @@ class ResourceEntryRepository(RepositoryBase):
                         created_dt=entry.created_dt,
                         deleted=entry.deleted,
                     )
-                    .on_conflict_do_update(
-                        constraint="resource_type_id", set_={"version": subquery}
-                    )
+                    .on_conflict_do_update(constraint="resource_type_id", set_={"version": subquery})
                 )
                 result = self.db_session.scalars(
                     insert_stmt.returning(ResourceEntry),

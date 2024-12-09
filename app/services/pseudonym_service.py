@@ -46,9 +46,7 @@ class PseudonymService(PseudonymServiceInterface):
                     "target_provider_id": str(provider_id),
                 },
                 timeout=self.timeout,
-                cert=(self.mtls_cert, self.mtls_key)
-                if self.mtls_cert and self.mtls_key
-                else None,
+                cert=(self.mtls_cert, self.mtls_key) if self.mtls_cert and self.mtls_key else None,
                 verify=self.mtls_ca if self.mtls_ca else True,
             )
         except (Exception, HTTPError) as e:

@@ -61,9 +61,7 @@ class TestApi(unittest.TestCase):
             params={"pseudonym": self.PSEUDONYM_1},
         )
         assert response.status_code == 400
-        assert (
-            response.json()["detail"] == "resourceType is required in the resource data"
-        )
+        assert response.json()["detail"] == "resourceType is required in the resource data"
 
     def put_resource_fail2(self) -> None:
         # Put resource with incorrect resourceType
@@ -73,10 +71,7 @@ class TestApi(unittest.TestCase):
             params={"pseudonym": self.PSEUDONYM_1},
         )
         assert response.status_code == 400
-        assert (
-            response.json()["detail"]
-            == "resource type does not match the resource type in the URL"
-        )
+        assert response.json()["detail"] == "resource type does not match the resource type in the URL"
 
     def put_resource_fail3(self) -> None:
         # Put resource without id
@@ -106,10 +101,7 @@ class TestApi(unittest.TestCase):
             params={"pseudonym": self.PSEUDONYM_1},
         )
         assert response.status_code == 400
-        assert (
-            response.json()["detail"]
-            == "id in the resource data does not match the resource id in the URL"
-        )
+        assert response.json()["detail"] == "id in the resource data does not match the resource id in the URL"
 
     def put_resource_fail7(self) -> None:
         # Put resource with correct id
@@ -148,9 +140,7 @@ class TestApi(unittest.TestCase):
             url=f"/resource/patient/{self.PATIENT_ID_1}",
             json={"resourceType": "Patient", "id": f"{self.PATIENT_ID_1}"},
             params={"pseudonym": self.PSEUDONYM_1},
-            headers={
-                "If-Match": "2"
-            },  # Using same if match but ETag and version are both 3
+            headers={"If-Match": "2"},  # Using same if match but ETag and version are both 3
         )
         assert response.status_code == 412
 
