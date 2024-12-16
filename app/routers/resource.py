@@ -3,8 +3,8 @@ import uuid
 from typing import Annotated, Any, Dict
 
 from fastapi import APIRouter, Body, Depends, Header, HTTPException, Query
-from fhir.resources.bundle import Bundle, BundleEntry
-from fhir.resources.fhirtypes import Code, Id, UnsignedInt
+from fhir.resources.R4B.bundle import Bundle, BundleEntry
+from fhir.resources.R4B.fhirtypes import Code, Id, UnsignedInt
 from opentelemetry import trace
 from starlette.responses import Response
 

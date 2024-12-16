@@ -1,8 +1,8 @@
 # Business rules ImageStudy
 #   - Patient subject resource must be present
 #   - Series must have references to both an organisation and a physician
-from fhir.resources.imagingstudy import ImagingStudy, ImagingStudySeries
-from fhir.resources.resource import Resource
+from fhir.resources.R4B.imagingstudy import ImagingStudy, ImagingStudySeries
+from fhir.resources.R4B.resource import Resource
 
 from app.metadata.validators.Validator import Validator
 
