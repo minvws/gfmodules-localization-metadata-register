@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from fhir.resources.resource import Resource
+from fhir.resources.R4B.resource import Resource
 
 
 class InvalidResourceError(Exception):

@@ -2,7 +2,7 @@ import importlib
 import logging
 from typing import Any, Dict
 
-from fhir.resources.resource import Resource
+from fhir.resources.R4B.resource import Resource
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ def convert_resource_to_fhir(data: Dict[str, Any]) -> Resource | None:
         return None
 
     try:
-        module = importlib.import_module("fhir.resources." + resource_type.lower())
+        module = importlib.import_module("fhir.resources.R4B." + resource_type.lower())
         resource_class = getattr(module, resource_type, None)
         if resource_class:
             try:
