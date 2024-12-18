@@ -4,10 +4,8 @@
 from fhir.resources.R4B.imagingstudy import ImagingStudy, ImagingStudySeries
 from fhir.resources.R4B.resource import Resource
 
-from app.metadata.validators.Validator import Validator
 
-
-class ImagingStudyValidator(Validator):
+class ImagingStudyValidator:
     def validate(self, obj: Resource) -> None:
         if not isinstance(obj, ImagingStudy):
             raise Exception("Resource is not an ImagingStudy")
@@ -18,7 +16,7 @@ class ImagingStudyValidator(Validator):
         if obj.started is None:
             raise Exception("Started date must be present")
 
-        for series_entry in obj.series:
+        for series_entry in obj.series or []:
             if not isinstance(series_entry, ImagingStudySeries):
                 raise Exception("Instance found in series is not an ImagingStudySeries")
 
