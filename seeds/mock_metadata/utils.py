@@ -1,3 +1,4 @@
+import decimal
 from collections.abc import Sequence
 from datetime import date, datetime, timedelta
 import random
@@ -25,7 +26,9 @@ config = get_config()
 
 
 METADATA_SERVICE: Final[MetadataService] = MetadataService(
-    DbMetadataAdapter(Database(dsn=config.database.dsn, create_tables=config.database.create_tables))
+    DbMetadataAdapter(
+        Database(dsn=config.database.dsn, create_tables=config.database.create_tables)
+    )
 )
 URI_EXAMPLE: Final[str] = "https://example.org"
 T = TypeVar("T", bound=Resource)
@@ -36,6 +39,8 @@ class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o: Any) -> str:
         if type(o) in (datetime, date):
             return o.isoformat()
+        if isinstance(o, decimal.Decimal):
+            return str(o)
         return json.JSONEncoder.default(self, o)
 
 
@@ -97,16 +102,22 @@ def generate_coding(route: str, display_strings: Sequence[str] | None = None) ->
     return Coding.construct(
         system=f"{URI_EXAMPLE}/{route}",
         code=random.randint(100000, 999999),
-        display=(fake.random_element(elements=display_strings) if display_strings else fake.word().capitalize()),
+        display=(
+            fake.random_element(elements=display_strings)
+            if display_strings
+            else fake.word().capitalize()
+        ),
     )
 
 
-def _generate_period(start: date | None = None, end: date | None = None) -> dict[str, date]:
-    time_range = timedelta(weeks=15)
+def _generate_period(
+    start: date | None = None, end: date | None = None
+) -> dict[str, date]:
+    time_range = timedelta(weeks=5)
 
-    def generate(start: date, end: date) -> dict[str, date]:
-        start = fake.date_between(start_date=start, end_date=end)
-        end = fake.date_between(start_date=start, end_date=end)
+    def generate(start: date|None=None, end: date|None=None) -> dict[str, date]:
+        start = fake.date_between(start_date=start, end_date=end) if start is None else start
+        end = fake.date_between(start_date=start, end_date=end) if end is None else end
         return {"start": start, "end": end}
 
     match start, end:
@@ -131,7 +142,9 @@ class Identification(TypedDict):
 
 
 def generate_identification(component: str) -> Identification:
-    return Identification(id=(id := fake.uuid4()), identifier=[generate_identifier(component, id)])
+    return Identification(
+        id=(id := fake.uuid4()), identifier=[generate_identifier(component, id)]
+    )
 
 
 def displayname(name: HumanName):
