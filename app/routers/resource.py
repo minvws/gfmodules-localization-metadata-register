@@ -4,7 +4,6 @@ from typing import Annotated, Any, Dict
 
 from fastapi import APIRouter, Body, Depends, Header, HTTPException, Query
 from fhir.resources.R4B.bundle import Bundle, BundleEntry
-from fhir.resources.R4B.fhirtypes import Code, Id, UnsignedInt
 from opentelemetry import trace
 from starlette.responses import Response
 
@@ -44,12 +43,12 @@ def search_resource(
     p = pseudonym_service.exchange(Pseudonym(pseudonym), get_config().app.provider_id)
     entry = service.search_by_pseudonym(p, resource_type)
 
-    bundle = Bundle(  # type: ignore
+    bundle = Bundle(
         resource_type="Bundle",
-        id=Id(uuid.uuid4()),
-        type=Code("searchset"),
-        total=UnsignedInt(len(entry)),
-        entry=[BundleEntry(resource=res.resource) for res in entry],  # type: ignore
+        id=str(uuid.uuid4()),
+        type="searchset",
+        total=len(entry),
+        entry=[BundleEntry(resource=res.resource) for res in entry],
     )
 
     return bundle.dict()
