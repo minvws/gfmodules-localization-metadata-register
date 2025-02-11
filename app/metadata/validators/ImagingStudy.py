@@ -29,9 +29,9 @@ class ImagingStudyValidator:
             org_found = False
             physician_found = False
             for performer in series_entry.performer:
-                if performer.actor.type == "Organization":
+                if performer.actor.type == "Organization":  # type: ignore
                     org_found = True
-                if performer.actor.type == "Practitioner":
+                if performer.actor.type == "Practitioner":  # type: ignore
                     physician_found = True
 
             if not org_found:
