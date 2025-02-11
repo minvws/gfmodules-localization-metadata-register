@@ -1,9 +1,11 @@
 import unittest
 import uuid
+from datetime import date
 from typing import Any
 
 from fastapi.testclient import TestClient
-from fhir.resources.R4B.fhirtypes import Code, Date, HumanNameType, Id, IdentifierType
+from fhir.resources.R4B.humanname import HumanName
+from fhir.resources.R4B.identifier import Identifier
 from fhir.resources.R4B.patient import Patient
 
 from app.application import create_fastapi_app
@@ -245,17 +247,17 @@ class TestApi(unittest.TestCase):
     @staticmethod
     def get_patient_resource(id: str, given_name: str = "John") -> Patient:
         return Patient(  # type: ignore
-            id=Id(id),
+            id=str(id),
             identifier=[
-                IdentifierType(system="http://hospital.org/patients", value="12345"),
+                Identifier(system="http://hospital.org/patients", value="12345"),
             ],
             name=[
-                HumanNameType(
+                HumanName(
                     use="official",
                     family="Doe",
                     given=[given_name],
                 )
             ],
-            gender=Code("male"),
-            birthDate=Date(year=1980, month=1, day=1),
+            gender="male",
+            birthDate=date(1980, 1, 1),
         )
