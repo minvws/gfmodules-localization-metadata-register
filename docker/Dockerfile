@@ -41,6 +41,7 @@ WORKDIR ${PROJECT_DIR}
 FROM base AS builder
 
 COPY ./pyproject.toml ./poetry.lock ./
+
 RUN --mount=type=cache,target=${POETRY_CACHE_DIR} poetry install --no-root --no-interaction
 
 FROM base AS final
