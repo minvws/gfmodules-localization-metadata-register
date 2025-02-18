@@ -160,7 +160,7 @@ def put_resource(
         raise HTTPException(status_code=404, detail="Metadata not found")
 
     return Response(
-        content=fhir_resource.json(),
+        content=fhir_resource.model_dump_json(),
         media_type="application/fhir+json",
         status_code=201 if entry.version == 1 else 200,
         headers={
@@ -238,7 +238,7 @@ def get_resource_by_version(
         raise HTTPException(status_code=404, detail="Metadata not found")
 
     return Response(
-        content=fhir_resource.json(indent=2) if pretty else fhir_resource.json(),
+        content=fhir_resource.json(indent=2) if pretty else fhir_resource.model_dump_json(),
         media_type="application/fhir+json",
         status_code=200,
         headers={
