@@ -46,7 +46,7 @@ RUN --mount=type=cache,target=${POETRY_CACHE_DIR} poetry install --no-root --no-
 
 FROM base AS final
 
-COPY --from=builder /usr/local/ /usr/local/
+COPY --from=builder /usr/local /usr/local
 RUN chown -R ${APP_USER}:${APP_GROUP} /usr/local/lib/python3.11
 
 USER ${APP_USER}

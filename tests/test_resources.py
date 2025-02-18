@@ -242,11 +242,11 @@ class TestApi(unittest.TestCase):
 
     def get_patient_resource_json(self, id: str, given_name: str = "John") -> Any:
         patient = self.get_patient_resource(id, given_name)
-        return patient.json()
+        return patient.model_dump_json()
 
     @staticmethod
     def get_patient_resource(id: str, given_name: str = "John") -> Patient:
-        return Patient(  # type: ignore
+        return Patient(
             id=str(id),
             identifier=[
                 Identifier(system="http://hospital.org/patients", value="12345"),

@@ -55,7 +55,7 @@ def convert_resource_to_fhir(data: Dict[str, Any]) -> Resource | None:
         resource_class = getattr(module, resource_type, None)
         if resource_class:
             try:
-                resource = resource_class.parse_obj(data)
+                resource = resource_class.model_validate(data)
                 if isinstance(resource, Resource):
                     return resource
             except Exception as e:
