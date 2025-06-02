@@ -1,10 +1,10 @@
 import decimal
 from collections.abc import Sequence
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 import random
 from typing import TypedDict
 from fhir.resources.R4B.coding import Coding
-from fhir.resources.R4B.fhirtypes import PeriodType
+from fhir.resources.R4B.period import Period
 from fhir.resources.R4B.humanname import HumanName
 from fhir.resources.R4B.identifier import Identifier
 from fhir.resources.R4B.reference import Reference
@@ -51,7 +51,7 @@ def json_dumps(data: dict[str, Any]) -> str:
 def store(resource: Resource, pseudonym: Pseudonym) -> None:
     if (
         METADATA_SERVICE.update(
-            resource.resource_type,
+            resource.get_resource_type(),
             resource.id,
             data=json.loads(json_dumps(resource.dict())),
             pseudonym=pseudonym,
@@ -79,7 +79,7 @@ def write_and_store(resource: T, pseudonym: Pseudonym, dir: Path | None = None) 
     if not dir:
         dir = mocks_path(pseudonym)
     write_component(
-        component_filepath(dir, resource.resource_type.lower(), UUID(resource.id)),
+        component_filepath(dir, resource.get_resource_type().lower(), UUID(resource.id)),
         resource.dict(),
     )
     store(resource, pseudonym)
@@ -90,7 +90,7 @@ def generate_reference(resource: T, name: str | None = None) -> Reference:
     return Reference.construct(
         reference=resource.relative_path(),
         display=name or fake.word(),
-        type=resource.resource_type.capitalize(),
+        type=resource.get_resource_type().capitalize(),
     )
 
 
@@ -101,7 +101,7 @@ def generate_identifier(component: str, value: str) -> Identifier:
 def generate_coding(route: str, display_strings: Sequence[str] | None = None) -> Coding:
     return Coding.construct(
         system=f"{URI_EXAMPLE}/{route}",
-        code=random.randint(100000, 999999),
+        code=str(random.randint(100000, 999999)),
         display=(
             fake.random_element(elements=display_strings)
             if display_strings
@@ -118,7 +118,9 @@ def _generate_period(
     def generate(start: date|None=None, end: date|None=None) -> dict[str, date]:
         start = fake.date_between(start_date=start, end_date=end) if start is None else start
         end = fake.date_between(start_date=start, end_date=end) if end is None else end
-        return {"start": start, "end": end}
+        tz_start = datetime.combine(start, datetime.min.time()).replace(tzinfo=timezone.utc)
+        tz_end = datetime.combine(end, datetime.min.time()).replace(tzinfo=timezone.utc)
+        return {"start": tz_start, "end": tz_end}
 
     match start, end:
         case None, None:
@@ -132,8 +134,8 @@ def _generate_period(
             return generate(start, end)
 
 
-def generate_period(start: date | None = None, end: date | None = None) -> PeriodType:
-    return PeriodType(**_generate_period(start, end))
+def generate_period(start: date | None = None, end: date | None = None) -> Period:
+    return Period(**_generate_period(start, end))
 
 
 class Identification(TypedDict):

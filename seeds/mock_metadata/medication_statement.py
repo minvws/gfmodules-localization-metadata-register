@@ -1,15 +1,16 @@
 from collections.abc import Sequence
 import random
-from datetime import date
+from datetime import date, timezone
 
 from fhir.resources.R4B.annotation import Annotation
 from fhir.resources.R4B.codeableconcept import CodeableConcept
 from fhir.resources.R4B.dosage import Dosage, DosageDoseAndRate
-from fhir.resources.R4B.fhirtypes import QuantityType, PeriodType
 from fhir.resources.R4B.medication import Medication
 from fhir.resources.R4B.medicationstatement import MedicationStatement
 from fhir.resources.R4B.patient import Patient
 from fhir.resources.R4B.reference import Reference
+from fhir.resources.R4B.quantity import Quantity
+from fhir.resources.R4B.period import Period
 from typing_extensions import Final
 
 from app.data import Pseudonym
@@ -123,11 +124,11 @@ NOTES: Final[tuple[str, ...]] = (
 def generate_dose_and_rate() -> DosageDoseAndRate:
     return DosageDoseAndRate.construct(
         type=CodeableConcept.construct(coding=[generate_coding("dose-rate-type", DOSAGE_TYPE)]),
-        doseQuantity=QuantityType(
+        doseQuantity=Quantity(
             value=random.uniform(1, 10),
             system=f"{URI_EXAMPLE}/units-of-measure.org",
             unit=fake.random_element(elements=UNITS),
-            code=random.randint(100000, 999999),
+            code=str(random.randint(100000, 999999)),
         ),
     )
 
@@ -146,11 +147,11 @@ def generate_dosage() -> Dosage:
         ],
         asNeededBoolean=fake.boolean(chance_of_getting_true=20),
         doseAndRate=[generate_dose_and_rate()],
-        maxDosePerAdministration=QuantityType(
+        maxDosePerAdministration=Quantity(
             value=random.uniform(1, 10),
             system=f"{URI_EXAMPLE}/units-of-measure.org",
             unit=fake.random_element(elements=UNITS),
-            code=random.randint(100000, 999999),
+            code=str(random.randint(100000, 999999)),
         ),
         method=CodeableConcept.construct(
             coding=[
@@ -207,10 +208,10 @@ def generate_medication_statement(
             ]
         ),
         context=None,  # Not implemented
-        dateAsserted=fake.past_datetime(),
+        dateAsserted=fake.past_datetime(tzinfo=timezone.utc),
         derivedFrom=None,  # Not implemented
         dosage=[generate_dosage()],
-        effectivePeriod=PeriodType(**_generate_period(start_date, end_date)),
+        effectivePeriod=Period(**_generate_period(start_date, end_date)),
         **generate_identification("MedicationStatement"),
         informationSource=generate_information_source(),
         medicationReference=generate_reference(medication, str(medication.code.coding[0].display)),

@@ -11,6 +11,7 @@ from fhir.resources.R4B.patient import Patient
 from fhir.resources.R4B.practitioner import Practitioner
 
 from app.data import Pseudonym
+from datetime import timezone
 from seeds.mock_metadata.utils import (
     displayname,
     fake,
@@ -49,7 +50,7 @@ def _imaging_study_series(practitioner: Practitioner, organization: Organization
     return ImagingStudySeries.construct(
         uid=fake.uuid4(),
         number=idx,
-        started=fake.date_time_this_decade(),
+        started=fake.date_time_this_decade(tzinfo=timezone.utc),
         modality=generate_coding("modality", IMAGING_CODES),
         performer=[
             {
@@ -80,7 +81,7 @@ def generate_imagestudy(
         **generate_identification("study"),
         subject=generate_reference(patient, displayname(patient.name[0])),
         status=fake.random_element(elements=STATUS),
-        started=fake.date_time_this_decade(),
+        started=fake.date_time_this_decade(tzinfo=timezone.utc),
         numberOfSeries=series_count,
         series=[
             _imaging_study_series(
