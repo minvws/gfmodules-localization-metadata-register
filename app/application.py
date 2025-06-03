@@ -99,7 +99,7 @@ def setup_fastapi() -> FastAPI:
         fastapi.include_router(router)
 
     if get_config().stats.enabled:
-        fastapi.add_middleware(StatsdMiddleware, module_name=get_config().stats.module_name)
+        fastapi.add_middleware(StatsdMiddleware, module_name=get_config().stats.module_name or "default")
 
     fastapi.add_exception_handler(Exception, default_fhir_exception_handler)
 
